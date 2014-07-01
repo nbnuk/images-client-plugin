@@ -10,7 +10,7 @@ class ImagesClientPluginGrailsPlugin {
 
     // TODO Fill in these fields
     def title = "ALA Image Service Client Plugin" // Headline display name of the plugin
-    def author = "David Baird   "
+    def author = "David Baird"
     def authorEmail = "david.baird.ala@gmail.com    "
     def description = '''\
     A collection of useful utilities and components for use by clients of the ALA Image Service
