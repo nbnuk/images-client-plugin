@@ -1,12 +1,15 @@
-<plugin name='images-client-plugin' version='0.1.1' grailsVersion='2.3 &gt; *'>
+<plugin name='images-client-plugin' version='0.2.0' grailsVersion='2.3 &gt; *'>
   <author>David Baird</author>
   <authorEmail>david.baird.ala@gmail.com    </authorEmail>
   <title>ALA Image Service Client Plugin</title>
   <description>    A collection of useful utilities and components for use by clients of the ALA Image Service
 </description>
-  <documentation>http://grails.org/plugin/images-client-plugin</documentation>
+  <documentation>https://github.com/AtlasOfLivingAustralia/images-client-plugin/tree/master</documentation>
   <type>ImagesClientPluginGrailsPlugin</type>
   <resources>
     <resource>ImagesClientResources</resource>
+    <resource>images.client.plugin.ImageClientController</resource>
+    <resource>images.client.plugin.AsyncUploadService</resource>
+    <resource>images.client.plugin.ImagesWebService</resource>
   </resources>
 </plugin>

@@ -1,6 +1,6 @@
 class ImagesClientPluginGrailsPlugin {
     // the plugin version
-    def version = "0.1.1"
+    def version = "0.2.0"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "2.3 > *"
     // resources that are excluded from plugin packaging
@@ -8,7 +8,6 @@ class ImagesClientPluginGrailsPlugin {
             "grails-app/views/error.gsp"
     ]
 
-    // TODO Fill in these fields
     def title = "ALA Image Service Client Plugin" // Headline display name of the plugin
     def author = "David Baird"
     def authorEmail = "david.baird.ala@gmail.com    "
@@ -17,12 +16,12 @@ class ImagesClientPluginGrailsPlugin {
 '''
 
     // URL to the plugin's documentation
-    def documentation = "http://grails.org/plugin/images-client-plugin"
+    def documentation = "https://github.com/AtlasOfLivingAustralia/images-client-plugin/tree/master"
 
     // Extra (optional) plugin metadata
 
     // License: one of 'APACHE', 'GPL2', 'GPL3'
-    def license = "MPL"
+    def license = "MPL2"
 
     // Details of company behind the plugin (if there is one)
     def organization = [ name: "Atlas of Living Australia", url: "http://ala.org.au/" ]
@@ -31,10 +30,10 @@ class ImagesClientPluginGrailsPlugin {
 //    def developers = [ [ name: "Joe Bloggs", email: "joe@bloggs.net" ]]
 
     // Location of the plugin's issue tracker.
-//    def issueManagement = [ system: "JIRA", url: "http://jira.grails.org/browse/GPMYPLUGIN" ]
+    def issueManagement = [ system: "GIT", url: "https://github.com/AtlasOfLivingAustralia/images-client-plugin/issues" ]
 
     // Online location of the plugin's browseable source code.
-//    def scm = [ url: "http://svn.codehaus.org/grails-plugins/" ]
+    def scm = [ url: "https://github.com/AtlasOfLivingAustralia/images-client-plugin" ]
 
     def doWithWebDescriptor = { xml ->
         // TODO Implement additions to web.xml (optional), this event occurs before
