@@ -1,4 +1,4 @@
-<plugin name='images-client-plugin' version='0.2.0' grailsVersion='2.3 &gt; *'>
+<plugin name='images-client-plugin' version='0.2.1' grailsVersion='2.3 &gt; *'>
   <author>David Baird</author>
   <authorEmail>david.baird.ala@gmail.com    </authorEmail>
   <title>ALA Image Service Client Plugin</title>

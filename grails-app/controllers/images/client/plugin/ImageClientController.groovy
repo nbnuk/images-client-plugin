@@ -18,7 +18,7 @@ class ImageClientController {
         if (req) {
             MultipartFile file = req.getFile('csvfile')
             if (!file || file.size == 0) {
-                renderResults([success: false, message: 'csvfile parameter not found, or empty. Please supply an csv file.'])
+                renderResults([success: false, message: 'File not supplied or is empty. Please supply a filename.'])
                 return
             }
 
@@ -26,19 +26,6 @@ class ImageClientController {
             int lineCount = 0
             def headers = []
             def batch = []
-            def results = [:]
-
-            def sendBatch = { List imageMaps ->
-                println imageMaps
-                def batchResults = imagesWebService.uploadImages(imageMaps)
-                if (batchResults?.success) {
-                    batchResults?.keySet()?.each { key ->
-                        results[key] = batchResults[key]
-                    }
-                } else {
-                    println batchResults
-                }
-            }
 
             file.inputStream.eachCsvLine { tokens ->
                 if (lineCount == 0) {
@@ -50,23 +37,19 @@ class ImageClientController {
                     }
                     batch << m
                 }
-
-                if (lineCount++ % 10 == 0) {
-                    sendBatch(batch)
-                    batch = []
-                }
+                lineCount++
             }
 
-            if (batch) {
-                sendBatch(batch)
-            }
-
-            renderResults([success: true, message: "", results: results])
-
+            def results = imagesWebService.scheduleImagesUpload(batch)
+            renderResults(results)
         } else {
             renderResults([success: false, message: "Expected multipart request containing 'csvfile' file parameter"])
         }
 
+    }
+
+    def getBatchProgress() {
+        renderResults(imagesWebService.getBatchStatus(params.batchId))
     }
 
     private renderResults(Object results, int responseCode = 200) {
@@ -87,5 +70,7 @@ class ImageClientController {
         response.addHeader("Access-Control-Allow-Origin", "")
         response.status = responseCode
     }
+
+
 
 }

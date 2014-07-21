@@ -1,5 +1,6 @@
 package images.client.plugin
 
+import groovy.json.JsonSlurper
 import groovyx.net.http.ContentType
 import groovyx.net.http.HTTPBuilder
 import groovyx.net.http.HttpResponseDecorator
@@ -19,14 +20,20 @@ class ImagesWebService {
         return url
     }
 
-    public Map uploadImages(List<Map> images) {
-        def url = "${serviceUrl}ws/uploadImagesFromUrls"
+    public Map scheduleImagesUpload(List<Map> images) {
+        def url = "${serviceUrl}ws/scheduleUploadFromUrls"
         def results = postJSON(url, [images: images])
         if (results && results.status == 200) {
-            return results.content.results
+            return results.content
         } else {
             throw new RuntimeException("Upload failed! ${results}")
         }
+    }
+
+    def getBatchStatus(String batchId) {
+        def url = "${serviceUrl}ws/getBatchStatus?batchId=" + batchId
+        def results = getJSON(url)
+        return results
     }
 
     public Map getImageInfo(List images) {
@@ -51,6 +58,18 @@ class ImagesWebService {
             println results
         }
         return null
+    }
+
+    def getJSON(String url) {
+        try {
+            def u = new URL(url);
+            def text = u.text
+            return new JsonSlurper().parseText(text)
+        } catch (Exception ex) {
+            System.err.println(url)
+            System.err.println(ex.message)
+            return null
+        }
     }
 
     def static getHeadStatus(String url) {
