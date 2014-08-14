@@ -2,6 +2,8 @@ var imgvwr = {};
 
 (function(lib) {
 
+    var map_registry = {};
+
     var base_options = {
         imageServiceBaseUrl: "http://images.ala.org.au",
         auxDataUrl: ''
@@ -9,7 +11,6 @@ var imgvwr = {};
 
     lib.viewImage = function(targetDiv, imageId, options) {
         var mergedOptions = mergeOptions(options, targetDiv, imageId);
-        initDependencies(mergedOptions);
         initViewer(mergedOptions);
     };
 
@@ -28,9 +29,6 @@ var imgvwr = {};
         }
 
         return mergedOptions;
-    }
-
-    function initDependencies(opts) {
     }
 
     function initViewer(opts) {
@@ -71,7 +69,16 @@ var imgvwr = {};
             };
         }
 
-        var viewer = L.map('imageViewer', {
+        var target = $(opts.target).get(0);
+
+        // Check if this element has already been initialized as a leaflet viewer
+        if (map_registry[target]) {
+            // if so, we need to uninitialize it
+            map_registry[target].remove();
+            delete map_registry[target];
+        }
+
+        var viewer = L.map(target, {
             fullscreenControl: true,
             measureControl: measureControlOpts,
             minZoom: 2,
@@ -80,6 +87,8 @@ var imgvwr = {};
             center:new L.LatLng(centery, centerx),
             crs: L.CRS.Simple
         });
+
+        map_registry[target] = viewer;
 
         var urlMask = image.tileUrlPattern;
         L.tileLayer(urlMask, {
