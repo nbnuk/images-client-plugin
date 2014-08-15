@@ -6,7 +6,8 @@ var imgvwr = {};
 
     var base_options = {
         imageServiceBaseUrl: "http://images.ala.org.au",
-        auxDataUrl: ''
+        auxDataUrl: '',
+        initialZoom: 2
     };
 
     lib.viewImage = function(targetDiv, imageId, options) {
@@ -14,19 +15,23 @@ var imgvwr = {};
         initViewer(mergedOptions);
     };
 
+    lib.resizeViewer = function(targetDiv) {
+        var target = getTarget(targetDiv);
+        map_registry[target].invalidateSize();
+    };
+
+    /** Allows the target div to be specified as a selector or jquery object */
+    function getTarget(target) {
+        return $(target).get(0);
+    }
+
     function mergeOptions(userOptions, targetDiv, imageId) {
-        var mergedOptions = base_options;
+        var mergedOptions = {
+            target:  targetDiv,
+            imageId: imageId
+        };
 
-        mergedOptions.target = targetDiv;
-        mergedOptions.imageId = imageId;
-
-        if (userOptions.imageServiceBaseUrl) {
-            mergedOptions.imageServiceBaseUrl = userOptions.imageServiceBaseUrl;
-        }
-
-        if (userOptions.auxDataUrl) {
-            mergedOptions.auxDataUrl = userOptions.auxDataUrl
-        }
+        $.extend(mergedOptions, base_options, userOptions);
 
         return mergedOptions;
     }
@@ -69,7 +74,7 @@ var imgvwr = {};
             };
         }
 
-        var target = $(opts.target).get(0);
+        var target = getTarget(opts.target);
 
         // Check if this element has already been initialized as a leaflet viewer
         if (map_registry[target]) {
@@ -83,7 +88,7 @@ var imgvwr = {};
             measureControl: measureControlOpts,
             minZoom: 2,
             maxZoom: maxZoom,
-            zoom: 2,
+            zoom: opts.initialZoom <= 0 ? maxZoom : opts.initialZoom,
             center:new L.LatLng(centery, centerx),
             crs: L.CRS.Simple
         });
