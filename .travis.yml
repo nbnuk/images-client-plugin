@@ -11,16 +11,28 @@ before_install:
 - ~/install_gvm.sh
 - echo "gvm_auto_answer=true" > ~/.gvm/etc/config
 - source ~/.gvm/bin/gvm-init.sh
-- GRAILS_VERSION=`grep '^app\.grails\.version=' ./application.properties | sed -e
-  's/^app\.grails\.version=//g'`
+- GRAILS_VERSION=`grep '^\s*app.grails.version' application.properties | sed -e 's/^\s*app\.grails\.version=//g'
+  | tr -d "\r"`
+- echo "GRAILS_VERSION:$GRAILS_VERSION"
 - gvm install grails $GRAILS_VERSION || true
 before_script:
-- mkdir -p ~/.grails; wget -q -O ~/.grails/settings.groovy https://raw.githubusercontent.com/AtlasOfLivingAustralia/travis-build-configuration/master/travis_grails_settings_new.groovy
-- MAVEN_REPO="ala-repo-snapshot"; grep '^app\.version=' ./application.properties |
-  grep -q "\-SNAPSHOT"; if [ "$?" = "1" ]; then MAVEN_REPO="ala-repo-release"; fi;
-script: grails clean && grails refresh-dependencies --non-interactive && grails prod
-  war --non-interactive && grails prod maven-deploy --repository=$MAVEN_REPO --non-interactive
+- GRAILS_VERSION_NUMBER=`echo $GRAILS_VERSION | sed -e 's/\.[0-9]*$//g' -e 's/\.//g'`
+- echo "GRAILS_VERSION_NUMBER:$GRAILS_VERSION_NUMBER"
+- GRAILS_SETTINGS_FILE="travis_grails_settings_new.groovy"
+- if [ "$GRAILS_VERSION_NUMBER" -lt "23" ]; then GRAILS_SETTINGS_FILE="travis_grails_settings_old.groovy";
+  fi;
+- echo "GRAILS_SETTINGS_FILE:$GRAILS_SETTINGS_FILE"
+- mkdir -p ~/.grails; wget -q -O ~/.grails/settings.groovy https://raw.githubusercontent.com/AtlasOfLivingAustralia/travis-build-configuration/master/$GRAILS_SETTINGS_FILE
+- MAVEN_REPO="ala-repo-snapshot"
+- grep '^\s*app\.version=' ./application.properties | grep -q "\-SNAPSHOT"; if [ "$?"
+  = "1" ]; then MAVEN_REPO="ala-repo-release"; fi;
+- echo "MAVEN_REPO:$MAVEN_REPO"
+script:
+- grails clean && grails refresh-dependencies --non-interactive && grails prod war
+  --non-interactive && grails prod maven-install --non-interactive
+after_success: '[ "${TRAVIS_PULL_REQUEST}" = "false" ] && grails prod maven-deploy
+  --repository=$MAVEN_REPO --non-interactive'
 env:
   global:
-  - secure: edStD+mxrQciSAbUgu8KfmhBpnnd70jaII9M5gQj05SQYjY52CciOhyQXtly0an5M5q5QVNiMMr5+NGmORPrwgVcF+6+rWA0AT5F32BFniW1aschWlkXvmw2kOF/bQM1Y2G4qIlSQNMlGWx1JsleDn5lfUJBOrI/tFnsr5arVQU=
-  - secure: cTn4StyrOoMwcV4+EaAJjgC56p0PyNkPqT2wpFFA+hx5RxgVM59GyCisPm9YhSbWKAfhB5NjTT0RzC8awSmj7fxEQDfUWYool9fBLrdXooH3Y6N0Qm4KFisNZ3UxYZV5eWOfaj36dW08mVgyJVAK/EjbJMKr5mgEKryc4GDg7Iw=
+  - secure: qiLV2nkvzkyR2SfvNA7P5bzvmsdH4oGmB8AO8YPWG+7SoKItV+vve+jFms9xpx7SU3wrydotUsZTcADl1vKOgGJunzT+Ge5IRs/qMqYzZn95CDYhIEAeTjK5v+1WAu/9AsvY6UchaL7Ro4dxn4n4T+p2Kngg2iZ+u+k9fZl5Pck=
+  - secure: b/Db5lJNIJBnjbzcc7EYnEKJT45U21QA/LvUuO8RApBsq+fuL8EOmymShjK0l0XcMHPNxi51fgUbJ/wMqMuMgEgYAV79oYajrVpe7v+GN2ng1f6ZB6MaaKqyHu71nf87XqsDNCSOLknI+oi4BenHgufzYNMoqZcML6+JILqL7bs=
