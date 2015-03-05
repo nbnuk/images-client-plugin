@@ -54,8 +54,9 @@ com_crashlytics_export_strings.xml
 /*.war
 
 # plugin release files
-/*.zip
-/plugin.xml
+*.zip
+*.zip.sha1
+plugin.xml
 
 # older plugin install locations
 /plugins
@@ -63,4 +64,5 @@ com_crashlytics_export_strings.xml
 
 # "temporary" build files
 /target
+
 
