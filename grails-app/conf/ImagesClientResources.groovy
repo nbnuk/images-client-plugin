@@ -1,33 +1,28 @@
 modules = {
 
-    fontawesome {
-        resource url: "http://netdna.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css"
-    }
-
     leaflet {
         dependsOn 'jquery'
-        resource url: 'js/leaflet/leaflet.css'
-        resource url: 'js/leaflet/Control.FullScreen.css'
-        resource url: 'js/leaflet/leaflet.js'
-        resource url: 'js/leaflet/Control.FullScreen.js'
-        resource url: 'js/leaflet/leaflet.measure.js'
-        resource url: 'js/leaflet/leaflet.measure.css'
+        resource url: [plugin: "images-client-plugin", dir: 'js/leaflet', file: 'leaflet.css']
+        resource url: [plugin: "images-client-plugin", dir: 'js/leaflet', file: 'Control.FullScreen.css']
+        resource url: [plugin: "images-client-plugin", dir: 'js/leaflet', file: 'leaflet.js']
+        resource url: [plugin: "images-client-plugin", dir: 'js/leaflet', file: 'Control.FullScreen.js']
+        resource url: [plugin: "images-client-plugin", dir: 'js/leaflet', file: 'leaflet.measure.js']
+        resource url: [plugin: "images-client-plugin", dir: 'js/leaflet', file: 'leaflet.measure.css']
     }
 
     leaflet_draw {
         dependsOn 'leaflet'
-        resource 'js/leaflet.draw/leaflet.draw.css'
-        resource 'js/leaflet.draw/leaflet.draw.js'
-
+        resource url: [plugin: "images-client-plugin", dir: 'js/leaflet.draw', file: 'leaflet.draw.css']
+        resource url: [plugin: "images-client-plugin", dir: 'js/leaflet.draw', file: 'leaflet.draw.js']
     }
 
     audiojs {
         dependsOn "jquery"
-        resource url: 'js/audiojs/audio.min.js'
+        resource url: [plugin: "images-client-plugin", dir: 'js/audiojs', file: 'audio.min.js']
     }
 
     viewer {
-        dependsOn "jquery, leaflet, leaflet_draw, fontawesome"
-        resource url: 'js/ala-image-viewer.js'
+        dependsOn 'jquery', 'leaflet', 'leaflet_draw', 'font-awesome'
+        resource url: [plugin: "images-client-plugin", dir: 'js', file: 'ala-image-viewer.js']
     }
 }
