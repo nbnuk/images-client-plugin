@@ -11,5 +11,5 @@ runtime ":images-client-plugin:0.4"
 ## Changelog
 
 * **version 0.4** (20/05/2015)
-  * Optional parameter `initialZoom` default value is now 'auto'. This means that the component will asjust the optimum zoom level so the image fits inside the image viewer container.
+  * Optional parameter `initialZoom` default value is now 'auto'. This means that the component will adjust the optimum zoom level so the image fits inside the image viewer container.
   * Removed unnecessary grails plugin dependency with ala-bootstrap2.
