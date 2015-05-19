@@ -2,7 +2,7 @@
 images-client-plugin
 ====================
 
-This plugin provides a reusabe image viewer component based on [Leaflet](http://leafletjs.com/).
+This plugin provides a reusable image viewer component based on [Leaflet](http://leafletjs.com/).
 
 ## Usage
 
