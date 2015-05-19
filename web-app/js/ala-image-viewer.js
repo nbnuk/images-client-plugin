@@ -7,7 +7,7 @@ var imgvwr = {};
     var base_options = {
         imageServiceBaseUrl: "http://images.ala.org.au",
         auxDataUrl: '',
-        initialZoom: 2
+        initialZoom: 'auto'
     };
 
     lib.viewImage = function(targetDiv, imageId, options) {
@@ -88,7 +88,7 @@ var imgvwr = {};
             measureControl: measureControlOpts,
             minZoom: 2,
             maxZoom: maxZoom,
-            zoom: opts.initialZoom <= 0 ? maxZoom : opts.initialZoom,
+            zoom: getInitialZoomLevel(opts.initialZoom, maxZoom, image, opts.target),
             center:new L.LatLng(centery, centerx),
             crs: L.CRS.Simple
         });
@@ -167,6 +167,36 @@ var imgvwr = {};
             viewer.addControl(new AuxInfoControl());
         }
     }
+
+    getInitialZoomLevel = function (initialZoom, maxZoom, image, container) {
+        var zoomLevel = maxZoom;
+        if (initialZoom == 'auto') {
+            var containerWidth = $(container).width();
+            var containerHeight = $(container).height();
+            var imageWidth = image.width;
+            var imageHeight = image.height;
+            if (imageWidth > imageHeight) {
+                // Landscape photo
+                while (containerWidth < imageWidth && zoomLevel > 0) {
+                    zoomLevel--;
+                    imageWidth /= 2;
+                }
+            } else {
+                // Portrait photo
+                while (containerHeight < imageHeight && zoomLevel > 0) {
+                    zoomLevel--;
+                    imageHeight /= 2;
+                }
+            }
+
+
+
+        } else if ($.isNumeric(initialZoom)) {
+            zoomLevel = Math.abs(initialZoom);
+        }
+
+        return zoomLevel
+    };
 
     lib.showModal = function(options) {
 
