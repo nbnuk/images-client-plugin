@@ -168,6 +168,15 @@ var imgvwr = {};
         }
     }
 
+    /**
+     * Returns the initial level of zoom for the image viewer. If initialZoom = 'auto' it will calculate the optimum zoom
+     * level for the available space in the viewer container
+     * @param initialZoom
+     * @param maxZoom
+     * @param image
+     * @param container
+     * @returns {*}
+     */
     getInitialZoomLevel = function (initialZoom, maxZoom, image, container) {
         var zoomLevel = maxZoom;
         if (initialZoom == 'auto') {
@@ -188,10 +197,7 @@ var imgvwr = {};
                     imageHeight /= 2;
                 }
             }
-
-
-
-        } else if ($.isNumeric(initialZoom)) {
+        } else if ($.isNumeric(initialZoom) && Math.abs(initialZoom) <= maxZoom) {
             zoomLevel = Math.abs(initialZoom);
         }
 
