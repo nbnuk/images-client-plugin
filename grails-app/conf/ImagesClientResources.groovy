@@ -21,8 +21,8 @@ modules = {
         resource url: [plugin: "images-client-plugin", dir: 'js/audiojs', file: 'audio.min.js']
     }
 
-    viewer {
-        dependsOn 'jquery', 'leaflet', 'leaflet_draw', 'font-awesome'
+    image_viewer {
+        dependsOn 'jquery', 'bootstrap', 'leaflet', 'leaflet_draw', 'font-awesome'
         resource url: [plugin: "images-client-plugin", dir: 'js', file: 'ala-image-viewer.js']
     }
 }

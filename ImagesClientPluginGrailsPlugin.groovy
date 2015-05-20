@@ -1,6 +1,6 @@
 class ImagesClientPluginGrailsPlugin {
     // the plugin version
-    def version = "0.4-SNAPSHOT"
+    def version = "0.6-SNAPSHOT"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "2.2 > *"
     // resources that are excluded from plugin packaging
