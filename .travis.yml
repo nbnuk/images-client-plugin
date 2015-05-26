@@ -2,9 +2,8 @@ language: groovy
 jdk:
 - oraclejdk7
 branches:
-  only:
-  - master
-  - specimenbrowser-issues
+  except:
+  - trunk
 before_install:
 - rm -rf ~/.gvm
 - curl -s get.gvmtool.net > ~/install_gvm.sh
