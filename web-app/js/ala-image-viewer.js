@@ -2,6 +2,7 @@ var imgvwr = {};
 
 (function(lib) {
 
+    var _viewer;
     var map_registry = {};
     var imageServiceBaseUrl = "http://dev.ala.org.au:8080/ala-images";
 
@@ -14,8 +15,10 @@ var imgvwr = {};
         addDrawer: true,
         addSubImageToggle: true,
         addCalibration: true,
-        addImageInfo: true
+        addImageInfo: true,
+        closeControlContent: null
     };
+
 
     lib.viewImage = function(targetDiv, imageId, options) {
         var mergedOptions = mergeOptions(options, targetDiv, imageId);
@@ -25,6 +28,24 @@ var imgvwr = {};
     lib.resizeViewer = function(targetDiv) {
         var target = getTarget(targetDiv);
         map_registry[target].invalidateSize();
+    };
+
+    /**
+     * Removes current image layer. Use case example: when reuisng viewer instance in a popup you don't want the previous
+     * image to show up while the image you have requested is being loaded
+     */
+    lib.removeCurrentImage = function() {
+        _viewer.eachLayer(function(layer) {
+            _viewer.removeLayer(layer);
+        });
+    };
+
+    /**
+     * Provides the leaflet based viewer instance in case you need to perform some customizations
+     * @returns leaflet map instance instance
+     */
+    lib.getViewerInstance = function() {
+        return _viewer;
     };
 
     /** Allows the target div to be specified as a selector or jquery object */
@@ -115,6 +136,8 @@ var imgvwr = {};
             center: new L.LatLng(centery, centerx),
             crs: L.CRS.Simple
         });
+
+        _viewer = viewer;
 
         viewer.addLayer(drawnItems);
 
@@ -399,6 +422,32 @@ var imgvwr = {};
 
             viewer.addControl(new ViewSubImagesControl());
         }
+
+        if (opts.closeControlContent) {
+            var ClosePopupControl = L.Control.extend({
+                options: {
+                    position: 'topright',
+                    title: 'Close gallery',
+                    content: opts.closeControlContent
+                },
+
+                onAdd: function (map) {
+                    var options = this.options;
+                    var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+                    container['data-dismiss']="modal";
+                    var link = L.DomUtil.create('a', 'leaflet-control-close-popup', container);
+                    link.innerHTML = options.content;
+                    link.href = '#';
+                    container.title = options.title;
+
+                    return container;
+                }
+            });
+
+            viewer.addControl(new ClosePopupControl());
+
+        }
+
     }
 
     /**
