@@ -434,7 +434,6 @@ var imgvwr = {};
                 onAdd: function (map) {
                     var options = this.options;
                     var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
-                    container['data-dismiss']="modal";
                     var link = L.DomUtil.create('a', 'leaflet-control-close-popup', container);
                     link.innerHTML = options.content;
                     link.href = '#';
