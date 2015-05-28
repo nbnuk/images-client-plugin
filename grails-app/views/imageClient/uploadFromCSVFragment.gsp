@@ -51,8 +51,6 @@
         }, 1000);
     }
 
-
-
     $("#btnCancelCSVFileUpload").click(function(e) {
         e.preventDefault();
         imglib.hideModal();

@@ -1,10 +1,13 @@
 language: groovy
+sudo: false
 jdk:
 - oraclejdk7
 branches:
   except:
   - trunk
 before_install:
+- export TZ=Australia/Canberra
+- date
 - rm -rf ~/.gvm
 - curl -s get.gvmtool.net > ~/install_gvm.sh
 - chmod 775 ~/install_gvm.sh
@@ -16,7 +19,8 @@ before_install:
 - echo "GRAILS_VERSION:$GRAILS_VERSION"
 - gvm install grails $GRAILS_VERSION || true
 before_script:
-- GRAILS_VERSION_NUMBER=`echo $GRAILS_VERSION | sed -e 's/\.[0-9]*$//g' -e 's/\.//g'`
+- GRAILS_VERSION_NUMBER=`echo $GRAILS_VERSION | sed -e 's/\.[0-9]*$//g' -e 's/\.//g'
+  | tr -d "\r"`
 - echo "GRAILS_VERSION_NUMBER:$GRAILS_VERSION_NUMBER"
 - GRAILS_SETTINGS_FILE="travis_grails_settings_new.groovy"
 - if [ "$GRAILS_VERSION_NUMBER" -lt "23" ]; then GRAILS_SETTINGS_FILE="travis_grails_settings_old.groovy";
@@ -24,14 +28,16 @@ before_script:
 - echo "GRAILS_SETTINGS_FILE:$GRAILS_SETTINGS_FILE"
 - mkdir -p ~/.grails; wget -q -O ~/.grails/settings.groovy https://raw.githubusercontent.com/AtlasOfLivingAustralia/travis-build-configuration/master/$GRAILS_SETTINGS_FILE
 - MAVEN_REPO="ala-repo-snapshot"
-- grep '^\s*app\.version=' ./application.properties | grep -q "\-SNAPSHOT"; if [ "$?"
-  = "1" ]; then MAVEN_REPO="ala-repo-release"; fi;
+- APP_VERSION=`grep '^\s*def\s*version' *GrailsPlugin.groovy | sed -e 's/^.*= *"//g'
+  | sed -e 's/".*$//g' | tr -d "\r"`
+- echo $APP_VERSION | grep -q "\-SNAPSHOT"; if [ "$?" = "1" ]; then MAVEN_REPO="ala-repo-release";
+  fi;
+- echo "APP_VERSION:$APP_VERSION"
 - echo "MAVEN_REPO:$MAVEN_REPO"
 script:
-- grails clean && grails refresh-dependencies --non-interactive && grails prod maven-install --non-interactive
-after_success: '[ "${TRAVIS_PULL_REQUEST}" = "false" ] && grails prod maven-deploy
-  --repository=$MAVEN_REPO --non-interactive'
+- grails clean && grails refresh-dependencies --non-interactive && grails prod maven-install
+  --non-interactive && grails prod maven-deploy --repository=$MAVEN_REPO --non-interactive
 env:
   global:
-  - secure: qiLV2nkvzkyR2SfvNA7P5bzvmsdH4oGmB8AO8YPWG+7SoKItV+vve+jFms9xpx7SU3wrydotUsZTcADl1vKOgGJunzT+Ge5IRs/qMqYzZn95CDYhIEAeTjK5v+1WAu/9AsvY6UchaL7Ro4dxn4n4T+p2Kngg2iZ+u+k9fZl5Pck=
-  - secure: b/Db5lJNIJBnjbzcc7EYnEKJT45U21QA/LvUuO8RApBsq+fuL8EOmymShjK0l0XcMHPNxi51fgUbJ/wMqMuMgEgYAV79oYajrVpe7v+GN2ng1f6ZB6MaaKqyHu71nf87XqsDNCSOLknI+oi4BenHgufzYNMoqZcML6+JILqL7bs=
+  - secure: 8H8KsZuqo9KMJJRgl6w5TzBj2XIPYzxQfE/KvlV3PPLvwmJoL1d18Voh4vnAR3SA5WGI+ZlRBHZxbGDjRigIE4FpxN0WoDkGpRZVB/5nChH+ldViiYejDL4IkBmbhqG8x7zZ2GghLdeXqoQc3bqeaskxOBBmlYGMSA9YUWI4j4s=
+  - secure: DDeOByG9Mvo4bGVNgj54aqpQf8MrOQ7LP5Rha9TBScj9EHIPvp7trsoe0mJ6W/7gTZxPj5dO4qJIOR3m5WnhLgCQ9kNBUrzT7i/OcRkRraxVvO1XxeeEBpG2fooF1fdakrEv2Vq7Eh/Io/drnqPOgLBLtfwBvgKb4390sZPkpdA=
