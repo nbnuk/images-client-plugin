@@ -10,10 +10,16 @@ modules = {
         resource url: [plugin: "images-client-plugin", dir: 'js/leaflet', file: 'leaflet.measure.css']
     }
 
-    leaflet_draw {
+    'leaflet-draw' {
         dependsOn 'leaflet'
         resource url: [plugin: "images-client-plugin", dir: 'js/leaflet.draw', file: 'leaflet.draw.css']
         resource url: [plugin: "images-client-plugin", dir: 'js/leaflet.draw', file: 'leaflet.draw.js']
+    }
+
+    'leaflet-loading' {
+        dependsOn 'leaflet'
+        resource url: [plugin: "images-client-plugin", dir: 'js/leaflet.loading', file: 'Control.Loading.css']
+        resource url: [plugin: "images-client-plugin", dir: 'js/leaflet.loading', file: 'Control.Loading.js']
     }
 
     audiojs {
@@ -22,7 +28,7 @@ modules = {
     }
 
     'image-viewer' {
-        dependsOn 'jquery', 'bootstrap', 'leaflet', 'leaflet_draw', 'font-awesome'
+        dependsOn 'jquery', 'bootstrap', 'leaflet', 'leaflet-draw', 'leaflet-loading', 'font-awesome'
         resource url: [plugin: "images-client-plugin", dir: 'js', file: 'ala-image-viewer.js']
     }
 }

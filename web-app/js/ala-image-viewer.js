@@ -16,6 +16,7 @@ var imgvwr = {};
         addSubImageToggle: true,
         addCalibration: true,
         addImageInfo: true,
+        addLoading: true,
         closeControlContent: null
     };
 
@@ -421,6 +422,13 @@ var imgvwr = {};
             }
 
             viewer.addControl(new ViewSubImagesControl());
+        }
+
+        if (opts.addLoading) {
+            var loadingControl = L.Control.loading({
+                separate: true
+            });
+            viewer.addControl(loadingControl);
         }
 
         if (opts.closeControlContent) {
