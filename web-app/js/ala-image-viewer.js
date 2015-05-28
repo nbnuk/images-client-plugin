@@ -452,9 +452,7 @@ var imgvwr = {};
             });
 
             viewer.addControl(new ClosePopupControl());
-
         }
-
     }
 
     /**
