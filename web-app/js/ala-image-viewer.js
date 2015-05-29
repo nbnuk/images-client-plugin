@@ -36,9 +36,11 @@ var imgvwr = {};
      * image to show up while the image you have requested is being loaded
      */
     lib.removeCurrentImage = function() {
-        _viewer.eachLayer(function(layer) {
-            _viewer.removeLayer(layer);
-        });
+        if (_viewer) {
+            _viewer.eachLayer(function (layer) {
+                _viewer.removeLayer(layer);
+            });
+        }
     };
 
     /**
@@ -446,6 +448,10 @@ var imgvwr = {};
                     link.innerHTML = options.content;
                     link.href = '#';
                     container.title = options.title;
+                    L.DomEvent.on(container,'click', function() {
+                        $('a.leaflet-control-close-popup > i').click();
+                    });
+
 
                     return container;
                 }
