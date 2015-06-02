@@ -26,6 +26,14 @@ var imgvwr = {};
         closeControlContent: null
     };
 
+    lib.getImageClientBaseUrl = function(){
+        return imageClientUrl;
+    }
+
+    lib.getImageServiceBaseUrl = function(){
+        return imageServiceBaseUrl;
+    }
+
     lib.setImageClientBaseUrl = function(url){
         imageClientUrl = url;
     }
@@ -39,6 +47,13 @@ var imgvwr = {};
     }
 
     lib.viewImage = function(targetDiv, imageId, options) {
+        _imageId = imageId;
+        if(options.imageServiceBaseUrl){
+            lib.setImageServiceBaseUrl(options.imageServiceBaseUrl);
+        }
+        if(options.imageClientBaseUrl){
+            lib.setImageClientBaseUrl(options.imageClientBaseUrl);
+        }
         var mergedOptions = mergeOptions(options, targetDiv, imageId);
         initViewer(mergedOptions);
     };
@@ -87,12 +102,16 @@ var imgvwr = {};
     function initViewer(opts) {
         $.ajax( {
             dataType: 'jsonp',
-            url: imageServiceBaseUrl + "/ws/getImageInfo/" + opts.imageId,
+            url: imageServiceBaseUrl + "/ws/getImageInfo/" + _imageId,
             crossDomain: true
         }).done(function(image) {
             if (image.success) {
                 _createViewer(opts, image);
+            } else {
+                alert('Unable to load image from ' + imageServiceBaseUrl + "/ws/getImageInfo/" + _imageId)
             }
+        }).fail(function(){
+            alert('Unable to load image from ' + imageServiceBaseUrl + "/ws/getImageInfo/" + _imageId)
         });
     }
 
@@ -126,7 +145,7 @@ var imgvwr = {};
                 hideCalibration: !opts.addCalibration,
                 onCalibration: function (pixels) {
                     var opts = {
-                        url: imageClientUrl + "/imageClient/calibrateImage?id=" + imageId + "&pixelLength=" + Math.round(pixels),
+                        url: imageClientUrl + "/imageClient/calibrateImage?id=" + _imageId + "&pixelLength=" + Math.round(pixels),
                         title: 'Calibrate image scale'
                     };
                     lib.showModal(opts);
@@ -430,8 +449,6 @@ var imgvwr = {};
                             .setLatLng(e.latlng) //(assuming e.latlng returns the coordinates of the event)
                             .setContent('<p>Loading..' + e.target.options.imageId +'.</p>')
                             .openOn(_viewer);
-                        console.log('loading ' + e.target.options.imageId);
-
                         $.ajax( imageServiceBaseUrl + "/image/imageTooltipFragment?imageId=" + e.target.options.imageId).then(function(content) {
                                 popup.setContent(content);
                             },

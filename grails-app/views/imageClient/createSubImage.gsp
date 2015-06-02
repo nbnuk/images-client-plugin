@@ -23,7 +23,7 @@
 
     $("#btnCreateSubimage2").click(function(e) {
         e.preventDefault();
-        var url = "${grailsApplication.config.ala.image.service.url}/ws/createSubimage?id=${params.id}&x=${params.x}&y=${params.y}&width=${params.width}&height=${params.height}&userId=${userId}&description=" + encodeURIComponent($('#description').val());
+        var url = imgvwr.getImageServiceBaseUrl() + "/ws/createSubimage?id=${params.id}&x=${params.x}&y=${params.y}&width=${params.width}&height=${params.height}&userId=${userId}&description=" + encodeURIComponent($('#description').val());
         $.ajax(url).done(function(results) {
             if (results.success) {
                 imgvwr.hideModal();

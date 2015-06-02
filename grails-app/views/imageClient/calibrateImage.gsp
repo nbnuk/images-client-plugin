@@ -31,7 +31,7 @@
         var units = $("#units").val();
         var pixelLength = $("#pixelLength").val();
         var actualLength = $("#mmLength").val();
-        $.ajax("${grailsApplication.config.ala.image.service.url}/ws/calibrateImageScale?imageId=${params.id}&units=${params.units}&pixelLength=" + pixelLength + "&userId=${userId}&actualLength=" + actualLength).done(function(data) {
+        $.ajax(imgvwr.getImageServiceBaseUrl() + "/ws/calibrateImageScale?imageId=${params.id}&units=${params.units}&pixelLength=" + pixelLength + "&userId=${userId}&actualLength=" + actualLength).done(function(data) {
             imgvwr.setPixelLength(data.pixelsPerMM);
             imgvwr.hideModal();
         });
