@@ -3,11 +3,17 @@ var imgvwr = {};
 (function(lib) {
 
     var _viewer;
+    var _imageOverlays;
+    var _imageId;
+    var _imageScaleFactor;
+    var _imageHeight;
+
     var map_registry = {};
-    var imageServiceBaseUrl = "http://dev.ala.org.au:8080/ala-images";
+    var imageServiceBaseUrl = "http://images.ala.org.au";
+    //this should be the context path of the app using the plugin e.g. "/specimenbrowser"
+    var imageClientUrl = "";
 
     var base_options = {
-        imageServiceBaseUrl:  "http://dev.ala.org.au:8080/ala-images",
         auxDataUrl: '',
         auxDataTitle: 'View more information about this image',
         initialZoom: 'auto',
@@ -24,8 +30,34 @@ var imgvwr = {};
         }
     };
 
+    lib.getImageClientBaseUrl = function(){
+        return imageClientUrl;
+    }
+
+    lib.getImageServiceBaseUrl = function(){
+        return imageServiceBaseUrl;
+    }
+
+    lib.setImageClientBaseUrl = function(url){
+        imageClientUrl = url;
+    }
+
+    lib.setImageServiceBaseUrl = function(url){
+        imageServiceBaseUrl = url;
+    }
+
+    lib.setPixelLength = function(pixelLength){
+        _viewer.measureControl.mmPerPixel = pixelLength;
+    }
 
     lib.viewImage = function(targetDiv, imageId, options) {
+        _imageId = imageId;
+        if(options.imageServiceBaseUrl){
+            lib.setImageServiceBaseUrl(options.imageServiceBaseUrl);
+        }
+        if(options.imageClientBaseUrl){
+            lib.setImageClientBaseUrl(options.imageClientBaseUrl);
+        }
         var mergedOptions = mergeOptions(options, targetDiv, imageId);
         initViewer(mergedOptions);
     };
@@ -72,52 +104,52 @@ var imgvwr = {};
     }
 
     function initViewer(opts) {
-
-        imageServiceBaseUrl = opts.imageServiceBaseUrl;
-
         $.ajax( {
             dataType: 'jsonp',
-            url: imageServiceBaseUrl + "/ws/getImageInfo/" + opts.imageId,
+            url: imageServiceBaseUrl + "/ws/getImageInfo/" + _imageId,
             crossDomain: true
         }).done(function(image) {
             if (image.success) {
                 _createViewer(opts, image);
+            } else {
+                alert('Unable to load image from ' + imageServiceBaseUrl + "/ws/getImageInfo/" + _imageId)
             }
+        }).fail(function(){
+            alert('Unable to load image from ' + imageServiceBaseUrl + "/ws/getImageInfo/" + _imageId)
         });
     }
 
     function _createViewer(opts, image) {
 
-        var imageId = opts.imageId;
-        imageServiceBaseUrl = opts.imageServiceBaseUrl;
+        _imageId = opts.imageId;
         var maxZoom = image.tileZoomLevels ? image.tileZoomLevels - 1 : 0;
 
-        var imageScaleFactor =  Math.pow(2, maxZoom);
-        var imageHeight = image.height;
+        _imageScaleFactor =  Math.pow(2, maxZoom);
+        _imageHeight = image.height;
 
-        var centerx = image.width / 2 / imageScaleFactor;
-        var centery = image.height / 2 / imageScaleFactor;
+        var centerx = image.width / 2 / _imageScaleFactor;
+        var centery = image.height / 2 / _imageScaleFactor;
 
-        var p1 = L.latLng(image.height / imageScaleFactor, 0);
-        var p2 = L.latLng(0, image.width / imageScaleFactor);
+        var p1 = L.latLng(image.height / _imageScaleFactor, 0);
+        var p2 = L.latLng(0, image.width / _imageScaleFactor);
         var bounds = new L.latLngBounds(p1, p2);
 
         var measureControlOpts = false;
 
         var drawnItems = new L.FeatureGroup();
 
-        var imageOverlays = new L.FeatureGroup();
+        _imageOverlays = new L.FeatureGroup();
 
         if(opts.addCalibration) {
             measureControlOpts = {
                 mmPerPixel: image.mmPerPixel,
-                imageScaleFactor: imageScaleFactor,
+                imageScaleFactor: _imageScaleFactor,
                 imageWidth: image.width,
                 imageHeight: image.height,
                 hideCalibration: !opts.addCalibration,
                 onCalibration: function (pixels) {
                     var opts = {
-                        url: imageServiceBaseUrl + "/dialog/calibrateImageFragment/" + imageId + "?pixelLength=" + Math.round(pixels),
+                        url: imageClientUrl + "/imageClient/calibrateImage?id=" + _imageId + "&pixelLength=" + Math.round(pixels),
                         title: 'Calibrate image scale'
                     };
                     lib.showModal(opts);
@@ -152,12 +184,12 @@ var imgvwr = {};
 
         var urlMask = image.tileUrlPattern;
         L.tileLayer(urlMask, {
-            attribution: '',
             maxNativeZoom: maxZoom,
             continuousWorld: true,
             tms: true,
             noWrap: true,
-            bounds: bounds
+            bounds: bounds,
+            attribution: 'Atlas of Living Australia'
         }).addTo(viewer);
 
         if (opts.addImageInfo){
@@ -169,7 +201,7 @@ var imgvwr = {};
                 },
                 onAdd: function (map) {
                     var container = L.DomUtil.create("div", "leaflet-bar");
-                    var detailsUrl = imageServiceBaseUrl + "/image/details/" + opts.imageId;
+                    var detailsUrl = imageServiceBaseUrl + "/image/details/" + _imageId;
                     $(container).html("<a href='" + detailsUrl + "' title='" + this.options.title + "'><span class='fa fa-external-link'></span></a>");
                     return container;
                 }
@@ -187,7 +219,7 @@ var imgvwr = {};
                 },
                 onAdd: function (map) {
                     var container = L.DomUtil.create("div", "leaflet-bar");
-                    $(container).html("<a id='btnImageAuxInfo' title='" + opts.auxDataTitle + "' href='#'><span class='fa fa-info'></span></a>");
+                    $(container).html("<a id='btnImageAuxInfo'  title='" + opts.auxDataTitle + "' href='#'><span class='fa fa-info'></span></a>");
                     $(container).find("#btnImageAuxInfo").click(function (e) {
                         e.preventDefault();
                         $.ajax( {
@@ -205,13 +237,13 @@ var imgvwr = {};
                             }
 
                             if (auxdata.link && auxdata.linkText) {
-                                body += '<div><a href="' + auxdata.link + '">' + auxdata.linkText + '</a>';
+                                body += '<div><a class="btn btn-primary" href="' + auxdata.link + '">' + auxdata.linkText + '</a>';
                             } else if (auxdata.link) {
-                                body += '<div><a href="' + auxdata.link + '">' + auxdata.link + '</a>';
+                                body += '<div><a class="btn btn-primary" href="' + auxdata.link + '">' + auxdata.link + '</a>';
                             }
 
                             lib.showModal({
-                                title: auxdata.title ? auxdata.title : "Image " + opts.imageId,
+                                title: auxdata.title ? auxdata.title : "Image " + _imageId,
                                 content: body,
                                 width: 800
                             });
@@ -237,7 +269,7 @@ var imgvwr = {};
                     $(container).html("<a id='btnDownload' title='Download this image' href='#'><span class='fa fa-download'></span></a>");
                     $(container).find("#btnDownload").click(function (e) {
                         e.preventDefault();
-                        window.location.href = opts.imageServiceBaseUrl + "/image/proxyImage/" + opts.imageId + "?contentDisposition=true";
+                        window.location.href = imageServiceBaseUrl + "/image/proxyImage/" + _imageId + "?contentDisposition=true";
                     });
                     return container;
                 }
@@ -286,8 +318,8 @@ var imgvwr = {};
                 var minx = image.width, miny = image.height, maxx = 0, maxy = 0;
 
                 for (var i = 0; i < ll.length; ++i) {
-                    var y = Math.round(image.height - ll[i].lat * imageScaleFactor);
-                    var x = Math.round(ll[i].lng * imageScaleFactor);
+                    var y = Math.round(image.height - ll[i].lat * _imageScaleFactor);
+                    var x = Math.round(ll[i].lng * _imageScaleFactor);
 
                     if (y < miny) {
                         miny = y;
@@ -306,7 +338,7 @@ var imgvwr = {};
                 var height = maxy - miny;
                 var width = maxx - minx;
 
-                var url = imageServiceBaseUrl + "/image/createSubimageFragment/" + imageId + "?x=" + minx + "&y=" + miny + "&width=" + width + "&height=" + height;
+                var url = imageClientUrl + "/imageClient/createSubImage?id=" + _imageId + "&x=" + minx + "&y=" + miny + "&width=" + width + "&height=" + height;
                 var opts = {
                     title: "Create subimage",
                     url: url,
@@ -336,7 +368,7 @@ var imgvwr = {};
 
         if (opts.addSubImageToggle){
 
-           viewer.addLayer(imageOverlays);
+           viewer.addLayer(_imageOverlays);
 
             var ViewSubImagesControl = L.Control.extend({
 
@@ -346,87 +378,14 @@ var imgvwr = {};
                 },
                 onAdd: function (map) {
                     var container = L.DomUtil.create("div", "leaflet-bar");
-                    $(container).html("<a id='btnViewSubimages' title='View subimages' href='#' style='width:110px;'>Show&nbsp;subimages</a>");
+                    $(container).html("<a id='btnViewSubimages' data-switch='off' title='View subimages' href='#' style='width:110px;'>Show&nbsp;subimages</a>");
                     $(container).find("#btnViewSubimages").click(function (e) {
                         e.preventDefault();
-                        var isShowing = hookShowSubimages();
-                        if(isShowing){
-                           $('#btnViewSubimages').html('Hide&nbsp;subimages');
-                        } else {
-                           $('#btnViewSubimages').html('Show&nbsp;subimages');
-                        }
+                        lib.toggleSubimages();
                     });
                     return container;
                 }
             });
-
-            function hookShowSubimages() {
-
-                if (imageOverlays.getLayers().length == 0) {
-                    $.ajax(imageServiceBaseUrl + "/ws/getSubimageRectangles/" + opts.imageId).done(function(results) {
-                        if (results.success) {
-                            for (var subimageIndex in results.subimages) {
-
-                                var rect = results.subimages[subimageIndex];
-                                var imageId = rect.imageId;
-                                var lng1 = rect.x / imageScaleFactor;
-                                var lat1 = (imageHeight - rect.y) / imageScaleFactor;
-                                var lng2 = (rect.x + rect.width) / imageScaleFactor;
-                                var lat2 = (imageHeight - (rect.y + rect.height)) / imageScaleFactor;
-                                var bounds = [[lat1,lng1], [lat2, lng2]];
-
-                                var feature = L.rectangle(bounds, { color: "#ff7800", weight: 1, imageId:imageId, className: imageId});
-                                feature.addTo(imageOverlays);
-                                feature.on("click", function(e) {
-                                    var imageId = e.target.options.imageId;
-                                    if (imageId) {
-                                        window.location = imageServiceBaseUrl + "/image/details?imageId=" + imageId;
-                                    }
-                                });
-
-                                feature.on('mouseover', function (e) {
-
-                                    var popup = L.popup()
-                                        .setLatLng(e.latlng) //(assuming e.latlng returns the coordinates of the event)
-                                        .setContent('<p>Loading..' + e.target.options.imageId +'.</p>')
-                                        .openOn(viewer);
-                                    console.log('loading ' + e.target.options.imageId);
-
-                                    $.ajax( imageServiceBaseUrl + "/image/imageTooltipFragment?imageId=" + e.target.options.imageId).then(function(content) {
-                                        popup.setContent(content);
-                                    },
-                                    function(xhr, status, error) {
-                                        console.log( status + ": " + error);
-                                    });
-                                });
-                                feature.on('mouseout', function (e) {
-                                    this.closePopup();
-                                });
-                            }
-
-                            $(".subimage-path").each(function() {
-                                var classNames = $(this).attr("class");
-                                classNames = $.trim(classNames).split(" ");
-                                // Work out the imageId
-                                var imageId = "";
-                                for (index in classNames) {
-                                    var className = classNames[index];
-                                    var matches = className.match(/imageId[-](.*)/);
-                                    if (matches) {
-                                        imageId = matches[1];
-                                        break;
-                                    }
-                                }
-                            });
-                        }
-                    });
-                    return true;
-                } else {
-                    imageOverlays.clearLayers();
-                    return false
-                }
-            }
-
             viewer.addControl(new ViewSubImagesControl());
         }
 
@@ -554,6 +513,84 @@ var imgvwr = {};
                     $(document).trigger(e);
                 });
             }
+        }
+    }
+
+    lib.showSubimages = function(){
+        _imageOverlays.clearLayers(); //clear and reload
+        $.ajax(imageServiceBaseUrl + "/ws/getSubimageRectangles/" + _imageId).done(function(results) {
+            if (results.success) {
+                for (var subimageIndex in results.subimages) {
+
+                    var rect = results.subimages[subimageIndex];
+                    var imageId = rect.imageId;
+                    var lng1 = rect.x / _imageScaleFactor;
+                    var lat1 = (_imageHeight - rect.y) / _imageScaleFactor;
+                    var lng2 = (rect.x + rect.width) / _imageScaleFactor;
+                    var lat2 = (_imageHeight - (rect.y + rect.height)) / _imageScaleFactor;
+                    var bounds = [[lat1,lng1], [lat2, lng2]];
+
+                    var feature = L.rectangle(bounds, { color: "#ff7800", weight: 1, imageId:imageId, className: imageId});
+                    feature.addTo(_imageOverlays);
+                    feature.on("click", function(e) {
+                        var imageId = e.target.options.imageId;
+                        if (imageId) {
+                            window.location = imageServiceBaseUrl + "/image/details?imageId=" + imageId;
+                        }
+                    });
+
+                    feature.on('mouseover', function (e) {
+
+                        var popup = L.popup()
+                            .setLatLng(e.latlng) //(assuming e.latlng returns the coordinates of the event)
+                            .setContent('<p>Loading..' + e.target.options.imageId +'.</p>')
+                            .openOn(_viewer);
+                        $.ajax( imageServiceBaseUrl + "/image/imageTooltipFragment?imageId=" + e.target.options.imageId).then(function(content) {
+                                popup.setContent(content);
+                            },
+                            function(xhr, status, error) {
+                                console.log( status + ": " + error);
+                            });
+                    });
+                    feature.on('mouseout', function (e) {
+                        this.closePopup();
+                    });
+                }
+
+                $(".subimage-path").each(function() {
+                    var classNames = $(this).attr("class");
+                    classNames = $.trim(classNames).split(" ");
+                    // Work out the imageId
+                    var imageId = "";
+                    for (index in classNames) {
+                        var className = classNames[index];
+                        var matches = className.match(/imageId[-](.*)/);
+                        if (matches) {
+                            imageId = matches[1];
+                            break;
+                        }
+                    }
+                });
+            }
+
+            $('#btnViewSubimages').html('Hide&nbsp;subimages');
+            $.data($('#btnViewSubimages'), 'switch', 'on');
+        });
+    }
+
+    lib.hideSubimages = function(){
+        _imageOverlays.clearLayers();
+    }
+
+    lib.toggleSubimages = function() {
+        if($(this).data('switch') == 'off' || $(this).data('switch') === undefined){
+            lib.showSubimages();
+            $('#btnViewSubimages').html('Hide&nbsp;subimages');
+            $.data(this, 'switch', 'on');
+        } else {
+            lib.hideSubimages();
+            $('#btnViewSubimages').html('Show&nbsp;subimages');
+            $.data(this, 'switch', 'off');
         }
     }
 

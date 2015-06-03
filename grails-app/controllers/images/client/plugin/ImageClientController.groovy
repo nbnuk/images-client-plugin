@@ -8,6 +8,15 @@ import org.springframework.web.multipart.MultipartRequest
 class ImageClientController {
 
     def imagesWebService
+    def authService
+
+    def createSubImage(){
+        [userId: authService.getUserId()]
+    }
+
+    def calibrateImage(){
+        [userId: authService.getUserId()]
+    }
 
     def uploadFromCSVFragment() {
     }
