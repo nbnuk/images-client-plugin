@@ -17,7 +17,11 @@ var imgvwr = {};
         addCalibration: true,
         addImageInfo: true,
         addLoading: true,
-        closeControlContent: null
+        galleryOptions: {
+            enableGalleryMode: false,
+            closeControlContent: null,
+            showFullScreenControls: false
+        }
     };
 
 
@@ -433,31 +437,123 @@ var imgvwr = {};
             viewer.addControl(loadingControl);
         }
 
-        if (opts.closeControlContent) {
-            var ClosePopupControl = L.Control.extend({
-                options: {
-                    position: 'topright',
-                    title: 'Close gallery',
-                    content: opts.closeControlContent
-                },
-
-                onAdd: function (map) {
-                    var options = this.options;
-                    var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
-                    var link = L.DomUtil.create('a', 'leaflet-control-close-popup', container);
-                    link.innerHTML = options.content;
-                    link.href = '#';
-                    container.title = options.title;
-                    L.DomEvent.on(container,'click', function() {
-                        $('a.leaflet-control-close-popup > i').click();
-                    });
-
-
-                    return container;
+        if (opts.galleryOptions.enableGalleryMode) {
+            $(document).on(window.fullScreenApi.fullScreenEventName, function (e) {
+                if (window.fullScreenApi.isFullScreen()) {
+                    $('.leaflet-control-close-popup').addClass('hidden');
+                    $('.leaflet-gallery-control-bar').removeClass('hidden');
+                } else {
+                    $('.leaflet-control-close-popup').removeClass('hidden');
+                    $('.leaflet-gallery-control-bar').addClass('hidden');
                 }
             });
 
-            viewer.addControl(new ClosePopupControl());
+            if (opts.galleryOptions.closeControlContent) {
+                var ClosePopupControl = L.Control.extend({
+                    options: {
+                        position: 'topright',
+                        title: 'Close gallery',
+                        content: opts.galleryOptions.closeControlContent
+                    },
+
+                    onAdd: function (map) {
+                        var options = this.options;
+                        var hiddenClass = window.fullScreenApi.isFullScreen() ? 'hidden' : '';
+                        var container = L.DomUtil.create('div', 'leaflet-control-close-popup leaflet-bar leaflet-control ' + hiddenClass);
+                        var link = L.DomUtil.create('a', '', container);
+                        link.innerHTML = options.content;
+                        link.href = '#';
+                        container.title = options.title;
+                        L.DomEvent.on(container, 'click', function () {
+                            $('.leaflet-control-close-popup i').click();
+                        });
+
+                        return container;
+                    }
+                });
+
+                viewer.addControl(new ClosePopupControl());
+            }
+
+            if (opts.galleryOptions.enableGalleryMode) {
+
+                if (opts.galleryOptions.closeControlContent) {
+                    var ClosePopupControl = L.Control.extend({
+                        options: {
+                            position: 'topright',
+                            title: 'Close gallery',
+                            content: opts.galleryOptions.closeControlContent
+                        },
+
+                        onAdd: function (map) {
+                            var options = this.options;
+                            var hiddenClass = window.fullScreenApi.isFullScreen() ? 'hidden' : '';
+                            var container = L.DomUtil.create('div', 'leaflet-control-close-popup leaflet-bar leaflet-control ' + hiddenClass);
+                            var link = L.DomUtil.create('a', '', container);
+                            link.innerHTML = options.content;
+                            link.href = '#';
+                            container.title = options.title;
+                            L.DomEvent.on(container, 'click', function () {
+                                $('.leaflet-control-close-popup i').click();
+                            });
+
+                            return container;
+                        }
+                    });
+
+                    viewer.addControl(new ClosePopupControl());
+                }
+
+                if (opts.galleryOptions.showFullScreenControls) {
+                    var ImgGalleryControlBar = L.Control.extend({
+                        options: {
+                            position: 'topright'
+                        },
+                        onAdd: function () {
+                            var hiddenClass = window.fullScreenApi.isFullScreen() ? '' : 'hidden';
+                            var container = L.DomUtil.create('div', 'leaflet-gallery-control-bar leaflet-bar leaflet-control leaflet-bar-horizontal ' + hiddenClass, this._control);
+
+                            var previous = L.DomUtil.create('a', 'leaflet-control-previous', container);
+                            previous.innerHTML = '<i class="fa fa-arrow-left" style="line-height:1.65;"></i>';
+                            previous.title ='Got to previous image';
+
+                            var next = L.DomUtil.create('a', 'leaflet-control-next', container);
+                            next.innerHTML = '<i class="fa fa-arrow-right" style="line-height:1.65;"></i>';
+                            next.title ='Got to next image';
+
+                            return container;
+                        }
+                    });
+
+                    viewer.addControl(new ImgGalleryControlBar());
+
+                }
+
+                $(document).off(window.fullScreenApi.fullScreenEventName);
+                $(document).on(window.fullScreenApi.fullScreenEventName, function (e) {
+                    if (window.fullScreenApi.isFullScreen()) {
+                        $('.leaflet-control-close-popup').addClass('hidden');
+                        $('.leaflet-gallery-control-bar').removeClass('hidden');
+                    } else {
+                        $('.leaflet-control-close-popup').removeClass('hidden');
+                        $('.leaflet-gallery-control-bar').addClass('hidden');
+                    }
+                });
+
+                $(document).off('click', 'a.leaflet-control-previous');
+                $(document).on('click', 'a.leaflet-control-previous', function () {
+                    var e = jQuery.Event("keydown");
+                    e.which = 37; // # Some key code value
+                    $(document).trigger(e);
+                });
+
+                $(document).off('click', 'a.leaflet-control-next');
+                $(document).on('click', 'a.leaflet-control-next', function () {
+                    var e = jQuery.Event("keydown");
+                    e.which = 39; // # Some key code value
+                    $(document).trigger(e);
+                });
+            }
         }
     }
 
