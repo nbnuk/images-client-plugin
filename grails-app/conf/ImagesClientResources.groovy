@@ -34,10 +34,10 @@ modules = {
 
     'img-gallery' {
         dependsOn 'image-viewer'
-        resource url: 'js/img-gallery/lib/slider-pro/css/slider-pro.css'
-        resource url: 'js/img-gallery/css/img-gallery.css'
+        resource url: [plugin: "images-client-plugin", dir: 'js/img-gallery/lib/slider-pro/css', file: 'slider-pro.css']
+        resource url: [plugin: "images-client-plugin", dir: 'js/img-gallery/css', file: 'img-gallery.css']
 
-        resource url: 'js/img-gallery/lib/slider-pro/js/jquery.sliderPro.custom.js'
-        resource url: 'js/img-gallery/js/img-gallery.js'
+        resource url: [plugin: "images-client-plugin", dir: 'js/img-gallery/lib/slider-pro/js', file: 'jquery.sliderPro.custom.js']
+        resource url: [plugin: "images-client-plugin", dir: 'js/img-gallery/js', file: 'img-gallery.js']
     }
 }
