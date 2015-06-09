@@ -32,23 +32,23 @@ var imgvwr = {};
 
     lib.getImageClientBaseUrl = function(){
         return imageClientUrl;
-    }
+    };
 
     lib.getImageServiceBaseUrl = function(){
         return imageServiceBaseUrl;
-    }
+    };
 
     lib.setImageClientBaseUrl = function(url){
         imageClientUrl = url;
-    }
+    };
 
     lib.setImageServiceBaseUrl = function(url){
         imageServiceBaseUrl = url;
-    }
+    };
 
     lib.setPixelLength = function(pixelLength){
         _viewer.measureControl.mmPerPixel = pixelLength;
-    }
+    };
 
     lib.viewImage = function(targetDiv, imageId, options) {
         _imageId = imageId;

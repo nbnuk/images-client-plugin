@@ -8,6 +8,11 @@ This plugin provides a reusable image viewer component based on [Leaflet](http:/
 
 runtime ":images-client-plugin:0.4"
 
+### Viewer options
+
+## Thumbnails gallery component
+
+
 ## Changelog
 
 * **version 0.4** (20/05/2015)

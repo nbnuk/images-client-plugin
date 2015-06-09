@@ -31,4 +31,13 @@ modules = {
         dependsOn 'jquery', 'bootstrap', 'leaflet', 'leaflet-draw', 'leaflet-loading', 'font-awesome'
         resource url: [plugin: "images-client-plugin", dir: 'js', file: 'ala-image-viewer.js']
     }
+
+    'img-gallery' {
+        dependsOn 'image-viewer'
+        resource url: 'js/img-gallery/lib/slider-pro/css/slider-pro.css'
+        resource url: 'js/img-gallery/css/img-gallery.css'
+
+        resource url: 'js/img-gallery/lib/slider-pro/js/jquery.sliderPro.custom.js'
+        resource url: 'js/img-gallery/js/img-gallery.js'
+    }
 }
