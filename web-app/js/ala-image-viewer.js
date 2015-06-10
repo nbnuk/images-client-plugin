@@ -32,23 +32,23 @@ var imgvwr = {};
 
     lib.getImageClientBaseUrl = function(){
         return imageClientUrl;
-    }
+    };
 
     lib.getImageServiceBaseUrl = function(){
         return imageServiceBaseUrl;
-    }
+    };
 
     lib.setImageClientBaseUrl = function(url){
         imageClientUrl = url;
-    }
+    };
 
     lib.setImageServiceBaseUrl = function(url){
         imageServiceBaseUrl = url;
-    }
+    };
 
     lib.setPixelLength = function(pixelLength){
         _viewer.measureControl.mmPerPixel = pixelLength;
-    }
+    };
 
     lib.viewImage = function(targetDiv, imageId, options) {
         _imageId = imageId;
@@ -80,7 +80,7 @@ var imgvwr = {};
     };
 
     /**
-     * Provides the leaflet based viewer instance in case you need to perform some customizations
+     * Provides the leaflet map/image viewer instance in case you need to perform some customizations
      * @returns leaflet map instance instance
      */
     lib.getViewerInstance = function() {
