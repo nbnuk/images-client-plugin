@@ -27,13 +27,13 @@ imgvwr.viewImage($("#viewerContainerId"), imageId, {custom options...});
 | ------- | ------- | -----------
 | imageServiceBaseUrl | 'http://images.ala.org.au' | URL where the images service is located
 | imageClientUrl | '' | Context path of the app using the plugin e.g. "/specimenbrowser". Required for using calibration and subimaging controls.
-| auxDataUrl | ''  | TODO
-| auxDataTitle | ''  | Default value is 'View more information about this image'... TODO
+| auxDataUrl | N/A  | A URL to a JSON webservice that provides key/value pairs to be rendered in the information popup
+| auxDataTitle | N/A  | Default value is 'View more information about this image'. A
 | initialZoom | 'auto' | number with the initial zoom level. When set to 'auto' the most suitable zoom level for the viewer container size will be automatically calculated.
 | addDownloadButton | true | Shows the image download button control.
-| addDrawer | true | TODO
-| addSubImageToggle | true | TODO
-| addCalibration | true | TODO
+| addDrawer | true | Add the rectangle draw tool
+| addSubImageToggle | true | Add the "show subimages" button
+| addCalibration | true | Add the calibration tools
 | addImageInfo | true | Shows button control with link to the image info page.
 | addLoading | true | Displays an unobtrusive loading indicator when tiles are loading or when other data is loading.
 | galleryOptions | {...} | Check the gallery component documentation bellow :point_down:
