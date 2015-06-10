@@ -80,7 +80,7 @@ var imgvwr = {};
     };
 
     /**
-     * Provides the leaflet based viewer instance in case you need to perform some customizations
+     * Provides the leaflet map/image viewer instance in case you need to perform some customizations
      * @returns leaflet map instance instance
      */
     lib.getViewerInstance = function() {

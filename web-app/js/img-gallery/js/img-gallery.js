@@ -1,5 +1,5 @@
 /**
- *
+ * GalleryWidget class
  * @param containerId
  * @param options
  * @returns public methods
@@ -31,8 +31,6 @@ var GalleryWidget = function(containerId, options) {
             $('#' + containerId).empty();
             carousel.update();
             carousel.destroy();
-            //$('#carousel').sliderPro('update');
-            //$('#carousel').sliderPro('destroy');
         }
     }
 
