@@ -80,5 +80,6 @@
     border-right-width: 0px;
 }
 
-
-
+.leaflet-control-close-popup a > i {
+    color: #000;
+}

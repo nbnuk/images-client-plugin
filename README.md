@@ -157,14 +157,18 @@ TODO
 
 
 ## Changelog
-* **version 0.6** (TODO)
+
+* **version 0.6.1** (15/06/2015)
+  * Bugfix for img thumbnail carousel.
+
+* **version 0.6** (10/06/2015)
   * Added reusable thumbnail image gallery component based a customized implementation of the [SliderPro](https://github.com/bqworks/slider-pro/) component to reuse just the thumbnail gallery bit. This component is responsive, accesible through keyboard and support the swipe mobile events.
   * Added some image gallery related options for the existing leaflet based viewer.
 
-* **version 0.5.3** (02/06/2005)
+* **version 0.5.3** (02/06/2015)
   * Bugfix release
 
-* **version 0.5** (28/05/2005)
+* **version 0.5** (28/05/2015)
   * Transfer of the subimaging tools to this plugin
   * Added [leaflet.loading](https://github.com/ebrelsford/Leaflet.loading) control.
 

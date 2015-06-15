@@ -18,10 +18,9 @@ var GalleryWidget = function(containerId, options) {
         thumbnailArrows: true,
         autoplay: false
     };
-    var carousel;
 
     var init = function() {
-        carousel = $('#' + containerId).sliderPro($.extend(defaultOptions, options));
+        $('#' + containerId).sliderPro($.extend(defaultOptions, options));
     };
 
     init();
@@ -29,8 +28,8 @@ var GalleryWidget = function(containerId, options) {
         destroy: function() {
             imgvwr.removeCurrentImage();
             $('#' + containerId).empty();
-            carousel.update();
-            carousel.destroy();
+            $('#' + containerId).sliderPro('update');
+            $('#' + containerId).sliderPro('destroy');
         }
     }
 
