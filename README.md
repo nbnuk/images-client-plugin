@@ -6,7 +6,7 @@ This plugin provides a reusable image viewer component based on [Leaflet](http:/
 
 ## Usage
 
-runtime ":images-client-plugin:0.6"
+`runtime ":images-client-plugin:0.6"`
 
 The `image-viewer` resource module needs to be added to the page where we want to use the viewer. Eg using the Resources plugin:
 
