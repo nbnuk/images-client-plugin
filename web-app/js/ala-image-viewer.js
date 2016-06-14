@@ -34,7 +34,8 @@ var imgvwr = {};
         userRatingHelpText: '<div><b>Up vote (<i class="fa fa-thumbs-o-up" aria-hidden="true"></i>) an image:</b>'+
         ' Image supports the identification of the species or is representative of the species.  Subject is clearly visible including identifying features.<br/><br/>'+
         '<b>Down vote (<i class="fa fa-thumbs-o-down" aria-hidden="true"></i>) an image:</b>'+
-        ' Image does not support the identification of the species, subject is unclear and identifying features are difficult to see or not visible.<br/><br/>',
+        ' Image does not support the identification of the species, subject is unclear and identifying features are difficult to see or not visible.<br/><br/>'+
+        'If this image is incorrectly identified please flag an issue on the record</div>',
         galleryOptions: {
             enableGalleryMode: false,
             closeControlContent: null,
@@ -478,7 +479,8 @@ var imgvwr = {};
                             onAdd: function (map) {
                                 var container = L.DomUtil.create("div", "leaflet-control-layers");
                                 this.container = container;
-                                $(container).html('<div style="padding:10px; width: 200px;"><a href="#" class="user-rating-help-text-dialog pull-right" style="padding-left:10px;"><b style="color:black"><i class="fa fa-times"></i></b></a>' + this.options.userRatingHelpText + "</div>");
+                                var helpText =  this.options.userRatingHelpText || base_options.userRatingHelpText;
+                                $(container).html('<div style="padding:10px; width: 200px;"><a href="#" class="user-rating-help-text-dialog pull-right" style="padding-left:10px;"><b style="color:black"><i class="fa fa-times"></i></b></a>' + helpText + "</div>");
                                 $(container).find('.user-rating-help-text-dialog').on('click', function (event) {
                                     viewer.removeControl(helpControl);
                                     helpControl = null;
