@@ -36,8 +36,16 @@ imgvwr.viewImage($("#viewerContainerId"), imageId, {custom options...});
 | addCalibration | true | Add the calibration tools
 | addImageInfo | true | Shows button control with link to the image info page.
 | addLoading | true | Displays an unobtrusive loading indicator when tiles are loading or when other data is loading.
+| addCloseButton | false | Add a control to dismiss bootstrap modal dialog.
+| addAttribution | false | Add a control to show image attribution. The text to show is passed on 'attribution' option.
+| attribution | '' | Text to show on attribution control. Make sure 'addAttribution' option is switched on.
+| addLikeDislikeButton | false | Add button to up and down vote and a help button.
+| disableLikeDislikeButton | false | Disable up and down vote buttons when user is not logged in.
+| likeUrl | '' | Url to call when a user up vote an image.
+| dislikeUrl | '' | Url to call when a user down vote an image.
+| userRatingUrl | '' | Url to call to get the current voting on an image.
+| userRatingHelpText | '' | Text to display when help button is clicked.
 | galleryOptions | {...} | Check the gallery component documentation bellow :point_down:
-
 
 ### Viewer public methods
 | Method | Description
@@ -157,6 +165,9 @@ TODO
 
 
 ## Changelog
+
+* **version 0.7** (14/06/2016)
+  * Added feature to up and down vote an image.
 
 * **version 0.6.1** (15/06/2015)
   * Bugfix for img thumbnail carousel.
