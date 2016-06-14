@@ -2,6 +2,8 @@ package images.client.plugin
 
 import grails.converters.JSON
 import grails.converters.XML
+import org.apache.commons.httpclient.HttpStatus
+import org.apache.http.entity.ContentType
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.multipart.MultipartRequest
 
@@ -80,6 +82,46 @@ class ImageClientController {
         response.status = responseCode
     }
 
+    def userRating(){
+        String userId = authService.getUserId()
+        if(params.id && userId){
+            Map result = imagesWebService.userRating(params.id, userId)
+            if(!result.error){
+                render text: result as grails.converters.JSON, contentType: ContentType.APPLICATION_JSON
+            } else {
+                render text: "An error occurred while looking up information", status: HttpStatus.SC_INTERNAL_SERVER_ERROR
+            }
+        } else {
+            render text: "You must be logged in and image id must be provided.", status: HttpStatus.SC_BAD_REQUEST
+        }
+    }
 
+    def likeImage() {
+        String userId = authService.getUserId()
+        if(params.id && userId){
+            Map result = imagesWebService.likeOrDislikeImage('LIKE', params.id, userId)
+            if(!result.error){
+                render text: result as grails.converters.JSON, contentType: ContentType.APPLICATION_JSON
+            } else {
+                render text: "An error occurred while saving metadata to image", status: HttpStatus.SC_INTERNAL_SERVER_ERROR
+            }
+        } else {
+            render text: "You must be logged in and image id must be provided.", status: HttpStatus.SC_BAD_REQUEST
+        }
+    }
+
+    def dislikeImage() {
+        String userId = authService.getUserId()
+        if(params.id && userId){
+            Map result = imagesWebService.likeOrDislikeImage('DISLIKE', params.id, userId)
+            if(!result.error){
+                render text: result as grails.converters.JSON, contentType: ContentType.APPLICATION_JSON
+            } else {
+                render text: "An error occurred while saving metadata to image", status: HttpStatus.SC_INTERNAL_SERVER_ERROR
+            }
+        } else {
+            render text: "You must be logged in and image id must be provided.", status: HttpStatus.SC_BAD_REQUEST
+        }
+    }
 
 }

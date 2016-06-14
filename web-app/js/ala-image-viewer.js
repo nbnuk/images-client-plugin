@@ -16,13 +16,25 @@ var imgvwr = {};
     var base_options = {
         auxDataUrl: '',
         auxDataTitle: 'View more information about this image',
+        attribution:null,
         initialZoom: 'auto',
+        disableLikeDislikeButton: false,
         addDownloadButton: true,
         addDrawer: true,
         addSubImageToggle: true,
         addCalibration: true,
+        addCloseButton: false,
         addImageInfo: true,
         addLoading: true,
+        addAttribution: false,
+        addLikeDislikeButton: false,
+        dislikeUrl: '',
+        likeUrl: '',
+        userRatingUrl: '',
+        userRatingHelpText: '<div><b>Up vote (<i class="fa fa-thumbs-o-up" aria-hidden="true"></i>) an image:</b>'+
+        ' Image supports the identification of the species or is representative of the species.  Subject is clearly visible including identifying features.<br/><br/>'+
+        '<b>Down vote (<i class="fa fa-thumbs-o-down" aria-hidden="true"></i>) an image:</b>'+
+        ' Image does not support the identification of the species, subject is unclear and identifying features are difficult to see or not visible.<br/><br/>',
         galleryOptions: {
             enableGalleryMode: false,
             closeControlContent: null,
@@ -389,6 +401,130 @@ var imgvwr = {};
             viewer.addControl(new ViewSubImagesControl());
         }
 
+        if (opts.addLikeDislikeButton){
+            var helpControl;
+            // block of code for like, dislike and help buttons
+            var FeedbackControl = L.Control.extend({
+                options: {
+                    position: "topleft",
+                    title: 'Close this dialog',
+                    disableButtons: opts.disableLikeDislikeButton,
+                    likeUrl: opts.likeUrl,
+                    dislikeUrl: opts.dislikeUrl,
+                    userRatingUrl: opts.userRatingUrl
+                },
+                onAdd: function (map) {
+                    var self = this;
+                    var container = L.DomUtil.create("div", "leaflet-bar leaflet-control");
+                    
+                    $(container).html('<a id="leafletLikeButton" href="#" class="fa fa-thumbs-o-up fa-2" aria-hidden="true"></i>' +
+                        '<a id="leafletDislikeButton" href="#" class="fa fa-thumbs-o-down fa-2" aria-hidden="true"></a>' +
+                        '<a id="leafletLikeDislikeHelpButton" href="#" class="fa fa-question fa-2" aria-hidden="true" title="Show help text"></a>'
+                    );
+
+                    // like an image
+                    $(container).find('#leafletLikeButton').on('click', function (event) {
+                        event.preventDefault();
+                        loadingControl.addLoader('like')
+
+                        $.ajax({
+                            url:self.options.likeUrl,
+                            success: function (data) {
+                                if(data.content.success){
+                                    setLikeButton()
+                                    loadingControl.removeLoader('like')
+                                }
+                            },
+                            error:function () {
+                                loadingControl.removeLoader('like')
+                            }
+                        })
+                    });
+
+                    // dislike an image
+                    $(container).find('#leafletDislikeButton').on('click', function (event) {
+                        event.preventDefault();
+                        loadingControl.addLoader('dislike')
+
+                        $.ajax({
+                            url:self.options.dislikeUrl,
+                            success: function (data) {
+                                if(data.content.success){
+                                    setDislikeButton()
+                                    loadingControl.removeLoader('dislike')
+                                }
+                            },
+                            error: function () {
+                                loadingControl.removeLoader('dislike')
+                            }
+                        })
+                    });
+
+                    // help button
+                    $(container).find('#leafletLikeDislikeHelpButton').on('click', function (event) {
+                        // remove previous control created
+                        if(helpControl){
+                            viewer.removeControl(helpControl);
+                            helpControl = null;
+                        }
+
+                        // create new control
+                        var HelpControl = L.Control.extend({
+
+                            options: {
+                                position: "topleft",
+                                userRatingHelpText: opts.userRatingHelpText
+                            },
+                            onAdd: function (map) {
+                                var container = L.DomUtil.create("div", "leaflet-control-layers");
+                                this.container = container;
+                                $(container).html('<div style="padding:10px; width: 200px;"><a href="#" class="user-rating-help-text-dialog pull-right" style="padding-left:10px;"><b style="color:black"><i class="fa fa-times"></i></b></a>' + this.options.userRatingHelpText + "</div>");
+                                $(container).find('.user-rating-help-text-dialog').on('click', function (event) {
+                                    viewer.removeControl(helpControl);
+                                    helpControl = null;
+                                    event.preventDefault();
+                                })
+
+                                return container;
+                            }
+                        });
+
+                        // add control to leaflet
+                        helpControl = new HelpControl();
+                        viewer.addControl(helpControl);
+
+                        event.preventDefault();
+                    })
+
+                    // show button status based on whether user is logged in.
+                    if(this.options.disableButtons){
+                        // disable buttons if user is not logged in
+                        $(container).find('#leafletLikeButton').addClass('leaflet-disabled').attr('title', "You must be logged in");
+                        $(container).find('#leafletDislikeButton').addClass('leaflet-disabled').attr('title', "You must be logged in");
+                    } else {
+                        // get user's image rating and update UI
+                        this.options.userRatingUrl && $.ajax({
+                            url: this.options.userRatingUrl,
+                            success: function (data) {
+                                switch (data.success){
+                                    case 'LIKE':
+                                        setLikeButton()
+                                        break;
+                                    case 'DISLIKE':
+                                        setDislikeButton()
+                                        break;
+                                }
+                            }
+                        })
+                    }
+
+                    return container;
+                }
+            });
+
+            viewer.addControl(new FeedbackControl());
+        }
+
         if (opts.addLoading) {
             var loadingControl = L.Control.loading({
                 separate: true
@@ -396,6 +532,47 @@ var imgvwr = {};
             viewer.addControl(loadingControl);
         }
 
+        // control to dismiss bootstrap modal dialog
+        if (opts.addCloseButton) {
+            var CloseControl = L.Control.extend({
+                options: {
+                    position: "topright",
+                    title: 'Close this dialog'
+                },
+                onAdd: function (map) {
+                    var container = L.DomUtil.create("div", "leaflet-bar");
+                    var $container = $(container);
+                    $container.html('<a id="closeLeafletModalButton" href="#" class="">&times;</a>');
+                    $container.attr('title',"Close this dialog");
+                    $container.find("#closeLeafletModalButton").click(function (e) {
+                        e.preventDefault();
+                        $(this).parents('.modal').modal('hide');
+                    });
+                    return container;
+                }
+            });
+
+            viewer.addControl(new CloseControl());
+        }
+
+        // add attribution control to bottom right
+        if (opts.addAttribution) {
+            var AttributionControl = L.Control.extend({
+                options: {
+                    position: "bottomright",
+                    title: 'Show attribution',
+                    attribution: opts.attribution
+                },
+                onAdd: function (map) {
+                    var container = L.DomUtil.create("div", "leaflet-control-layers");
+                    this.container = container;
+                    $(container).html("<div style='padding:10px'>" + this.options.attribution + "</div>");
+                    return container;
+                }
+            });
+
+            viewer.addControl(new AttributionControl());
+        }
 
         if (opts.galleryOptions.enableGalleryMode) {
 
@@ -476,6 +653,18 @@ var imgvwr = {};
                 $(document).trigger(e);
             });
         }
+    }
+
+    // set visual effects to show like status of image
+    function setLikeButton() {
+        $('#leafletLikeButton').removeClass('fa-thumbs-o-up').addClass('fa-thumbs-up').css('color', 'green').attr('title', 'You up voted this image');
+        $('#leafletDislikeButton').addClass('fa-thumbs-o-down').removeClass('fa-thumbs-down').css('color', 'black').attr('title', 'Click to down vote this image');
+    }
+
+    // set visual effects to show dislike status of image
+    function setDislikeButton() {
+        $('#leafletLikeButton').removeClass('fa-thumbs-up').addClass('fa-thumbs-o-up').css('color', 'black').attr('title', 'Click to up vote this image');
+        $('#leafletDislikeButton').addClass('fa-thumbs-down').removeClass('fa-thumbs-o-down').css('color', 'red').attr('title', 'You down voted this image!');
     }
 
     lib.showSubimages = function(){
