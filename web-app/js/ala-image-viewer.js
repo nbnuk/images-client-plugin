@@ -426,6 +426,10 @@ var imgvwr = {};
                     // like an image
                     $(container).find('#leafletLikeButton').on('click', function (event) {
                         event.preventDefault();
+                        if(self.options.disableButtons){
+                            return;
+                        }
+
                         loadingControl.addLoader('like')
 
                         $.ajax({
@@ -445,8 +449,11 @@ var imgvwr = {};
                     // dislike an image
                     $(container).find('#leafletDislikeButton').on('click', function (event) {
                         event.preventDefault();
-                        loadingControl.addLoader('dislike')
+                        if(self.options.disableButtons){
+                            return;
+                        }
 
+                        loadingControl.addLoader('dislike')
                         $.ajax({
                             url:self.options.dislikeUrl,
                             success: function (data) {
@@ -503,6 +510,7 @@ var imgvwr = {};
                         // disable buttons if user is not logged in
                         $(container).find('#leafletLikeButton').addClass('leaflet-disabled').attr('title', "You must be logged in");
                         $(container).find('#leafletDislikeButton').addClass('leaflet-disabled').attr('title', "You must be logged in");
+                        $(container).attr('title', "You must be logged in");
                     } else {
                         // get user's image rating and update UI
                         this.options.userRatingUrl && $.ajax({
