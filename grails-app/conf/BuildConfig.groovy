@@ -46,5 +46,6 @@ grails.project.dependency.resolution = {
             export = false
         }
         compile ':ala-auth:1.3.1'
+        runtime ':font-awesome-resources:4.3.0.1'
     }
 }
