@@ -5,6 +5,8 @@ var imgvwr = {};
     var _viewer;
     var _imageOverlays;
     var _imageId;
+    var _scientificName;
+    var _preferredImageStatus;
     var _imageScaleFactor;
     var _imageHeight;
 
@@ -27,6 +29,7 @@ var imgvwr = {};
         addImageInfo: true,
         addLoading: true,
         addAttribution: false,
+        addPreferenceButton: false,
         addLikeDislikeButton: false,
         dislikeUrl: '',
         likeUrl: '',
@@ -36,6 +39,8 @@ var imgvwr = {};
         '<b>Down vote (<i class="fa fa-thumbs-o-down" aria-hidden="true"></i>) an image:</b>'+
         ' Image does not support the identification of the species, subject is unclear and identifying features are difficult to see or not visible.<br/><br/>'+
         'If this image is incorrectly identified please flag an issue on the record</div>',
+        savePreferredSpeciesListUrl: '',
+        getPreferredSpeciesListUrl: '',
         galleryOptions: {
             enableGalleryMode: false,
             closeControlContent: null,
@@ -63,8 +68,10 @@ var imgvwr = {};
         _viewer.measureControl.mmPerPixel = pixelLength;
     };
 
-    lib.viewImage = function(targetDiv, imageId, options) {
+    lib.viewImage = function(targetDiv, imageId, scientificName, preferredImageStatus, options) {
         _imageId = imageId;
+        _scientificName = scientificName;
+        _preferredImageStatus = preferredImageStatus;
         if(options.imageServiceBaseUrl){
             lib.setImageServiceBaseUrl(options.imageServiceBaseUrl);
         }
@@ -402,6 +409,54 @@ var imgvwr = {};
             viewer.addControl(new ViewSubImagesControl());
         }
 
+        if (opts.addPreferenceButton) {
+
+            var PreferenceControl = L.Control.extend({
+
+                options: {
+                    position: "topleft",
+                    title: 'Add image to ALA Preferred Species Images List',
+                    preferredImageStatus: _preferredImageStatus,
+                    savePreferredSpeciesListUrl: opts.savePreferredSpeciesListUrl
+                },
+                onAdd: function (map) {
+                    var self = this;
+                    var container = L.DomUtil.create("div", "leaflet-bar");
+                    $(container).html("<a id='btnPreferredImage' title='Add image to Preferred Species Images List' href='#'><span class='fa fa-star'></span></a>");
+                    $(container).find("#btnPreferredImage").click(function (e) {
+                        e.preventDefault();
+                        if (self.options.preferredImageStatus == "true") {
+                            bootbox.alert("You cannot add this image as it has already been added to ALA Preffered Species Image List");
+                        } else {
+
+                            $.ajax({
+                                url: self.options.savePreferredSpeciesListUrl,
+                                success: function (data) {
+                                    if (data.status == 200) {
+                                        setPreferredButton(container);
+                                        self.options.preferredImageStatus == "true";
+                                        bootbox.alert("This Image has been successfully added to ALA Preferred Species Image List");
+                                    }
+                                },
+                                error: function (data) {
+                                    bootbox.alert("An error has occurred.\r\n" + data.responseText);
+                                }
+                            })
+                        }
+                    });
+
+                    if (self.options.preferredImageStatus == "true") {
+                        setPreferredButton(container);
+                    }
+
+                    return container;
+                }
+            });
+
+            viewer.addControl(new PreferenceControl());
+
+        }
+
         if (opts.addLikeDislikeButton){
             var helpControl;
             // block of code for like, dislike and help buttons
@@ -663,6 +718,14 @@ var imgvwr = {};
                 $(document).trigger(e);
             });
         }
+    }
+
+    function setPreferredButton(container) {
+        $(container).find("#btnPreferredImage").css('color', 'orange').attr('title', 'You have added this image to ALA Preferred Image Species List');
+    }
+
+    function removePreferredButton() {
+        $('#leafletLikeButton').css('color', 'black').attr('title', 'Add');
     }
 
     // set visual effects to show like status of image

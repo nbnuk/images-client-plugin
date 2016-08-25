@@ -1,5 +1,7 @@
 package images.client.plugin
 
+import au.org.ala.web.AlaSecured
+import au.org.ala.web.CASRoles
 import grails.converters.JSON
 import grails.converters.XML
 import org.apache.commons.httpclient.HttpStatus
@@ -10,6 +12,7 @@ import org.springframework.web.multipart.MultipartRequest
 class ImageClientController {
 
     def imagesWebService
+    def speciesListWebService
     def authService
 
     def createSubImage(){
@@ -93,6 +96,31 @@ class ImageClientController {
             }
         } else {
             render text: "You must be logged in and image id must be provided.", status: HttpStatus.SC_BAD_REQUEST
+        }
+    }
+
+    def getPreferredSpeciesImageList() {
+        def list = speciesListWebService.getPreferredImageSpeciesList ()
+        render text: list as grails.converters.JSON, contentType: ContentType.APPLICATION_JSON
+    }
+
+    @AlaSecured(value = "ROLE_ADMIN")
+    def saveImageToSpeciesList() {
+        String userId = authService.getUserId()
+        if (!userId) {
+            render text: "You must be logged in and image id must be provided.", status: HttpStatus.SC_BAD_REQUEST
+            return
+        }
+
+        if(params.id && params.scientificName){
+            Map result = speciesListWebService.saveImageToSpeciesList(params.scientificName, params.id)
+            if(!result.error){
+                render text: result as grails.converters.JSON, contentType: ContentType.APPLICATION_JSON
+            } else {
+                render text: "An error occurred while saving metadata to image", status: HttpStatus.SC_INTERNAL_SERVER_ERROR
+            }
+        } else {
+            render text: "Something went wrong. Please refresh and try again.", status: HttpStatus.SC_BAD_REQUEST
         }
     }
 

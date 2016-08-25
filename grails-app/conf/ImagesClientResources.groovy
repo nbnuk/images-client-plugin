@@ -30,6 +30,7 @@ modules = {
     'image-viewer' {
         dependsOn 'jquery', 'bootstrap', 'leaflet', 'leaflet-draw', 'leaflet-loading', 'font-awesome'
         resource url: [plugin: "images-client-plugin", dir: 'js', file: 'ala-image-viewer.js']
+        resource url: [plugin: "images-client-plugin", dir: 'js', file: 'bootbox.min.js']
     }
 
     'img-gallery' {
