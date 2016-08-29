@@ -439,7 +439,7 @@ var imgvwr = {};
                                     }
                                 },
                                 error: function (data) {
-                                    bootbox.alert("An error has occurred.\r\n" + data.responseText);
+                                    bootbox.alert("An error occurred while saving metadata to image. " + data.responseText);
                                 }
                             })
                         }

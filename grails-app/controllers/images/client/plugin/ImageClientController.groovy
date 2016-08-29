@@ -101,6 +101,9 @@ class ImageClientController {
 
     def getPreferredSpeciesImageList() {
         def list = speciesListWebService.getPreferredImageSpeciesList ()
+        if (!list) {
+            list = new ArrayList<String> ()
+        }
         render text: list as grails.converters.JSON, contentType: ContentType.APPLICATION_JSON
     }
 
@@ -109,18 +112,17 @@ class ImageClientController {
         String userId = authService.getUserId()
         if (!userId) {
             render text: "You must be logged in and image id must be provided.", status: HttpStatus.SC_BAD_REQUEST
-            return
-        }
-
-        if(params.id && params.scientificName){
-            Map result = speciesListWebService.saveImageToSpeciesList(params.scientificName, params.id)
-            if(!result.error){
-                render text: result as grails.converters.JSON, contentType: ContentType.APPLICATION_JSON
-            } else {
-                render text: "An error occurred while saving metadata to image", status: HttpStatus.SC_INTERNAL_SERVER_ERROR
-            }
         } else {
-            render text: "Something went wrong. Please refresh and try again.", status: HttpStatus.SC_BAD_REQUEST
+            if (params.id && params.scientificName) {
+                Map result = speciesListWebService.saveImageToSpeciesList(params.scientificName, params.id)
+                if (!result.error) {
+                    render text: result as grails.converters.JSON, contentType: ContentType.APPLICATION_JSON
+                } else {
+                    render text: result.error, status: HttpStatus.SC_INTERNAL_SERVER_ERROR
+                }
+            } else {
+                render text: "Something went wrong. Please refresh and try again.", status: HttpStatus.SC_BAD_REQUEST
+            }
         }
     }
 

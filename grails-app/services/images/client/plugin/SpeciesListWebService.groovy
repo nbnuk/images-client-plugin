@@ -36,19 +36,32 @@ class SpeciesListWebService {
     static def postJSON(url, Map params) {
         def result = [:]
         HTTPBuilder builder = new HTTPBuilder(url)
-        builder.request(Method.POST, ContentType.JSON) { request ->
+        builder.request(Method.POST, ContentType.JSON) {request ->
 
-            requestContentType : 'application/JSON'
             body = new JsonBuilder(params).toString()
 
-            response.success = {resp, message ->
+            response.success = {resp ->
                 result.status = resp.status
-                result.content = message
             }
 
             response.failure = {resp ->
+                def message = ""
+                switch (resp.status){
+                    case 400:
+                        message = "Missing required field: rawScientificName or imageId"
+                        break
+                    case 404:
+                        message = "Species could not be found"
+                        break
+                    case 412:
+                        message = "ALA Preferred Image Species List has not been setup"
+                        break
+                    case 500:
+                        message = "Could not create SpeciesListItem"
+                        break
+                }
                 result.status = resp.status
-                result.error = "Error POSTing to ${url}"
+                result.error = message
             }
 
         }
