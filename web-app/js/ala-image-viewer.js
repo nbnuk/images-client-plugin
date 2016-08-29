@@ -11,7 +11,7 @@ var imgvwr = {};
     var _imageHeight;
 
     var map_registry = {};
-    var imageServiceBaseUrl = "http://images.ala.org.au";
+    var imageServiceBaseUrl = "https://images.ala.org.au";
     //this should be the context path of the app using the plugin e.g. "/specimenbrowser"
     var imageClientUrl = "";
 
