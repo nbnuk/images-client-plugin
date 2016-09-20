@@ -45,7 +45,7 @@ grails.project.dependency.resolution = {
               ":rest-client-builder:1.0.3") {
             export = false
         }
-        compile ':ala-auth:1.3.1'
+        compile ':ala-auth:1.3.4'
         runtime ':font-awesome-resources:4.3.0.1'
     }
 }
