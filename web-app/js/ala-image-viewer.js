@@ -67,18 +67,30 @@ var imgvwr = {};
         _viewer.measureControl.mmPerPixel = pixelLength;
     };
 
-    lib.viewImage = function(targetDiv, imageId, scientificName, preferredImageStatus, options) {
+  //  lib.viewImage = function(targetDiv, imageId, scientificName, preferredImageStatus, options) {
+    lib.viewImage = function(targetDiv, imageId, scientificName, preferredImageStatus, guid, options) {
         _imageId = imageId;
         _scientificName = scientificName;
-        _preferredImageStatus = preferredImageStatus;
+        _preferredImageStatus = false;
         if(options.imageServiceBaseUrl){
             lib.setImageServiceBaseUrl(options.imageServiceBaseUrl);
         }
         if(options.imageClientBaseUrl){
             lib.setImageClientBaseUrl(options.imageClientBaseUrl);
         }
-        var mergedOptions = mergeOptions(options, targetDiv, imageId);
-        initViewer(mergedOptions);
+
+        if (guid != undefined) {
+            $.when(checkSpeciesImage(guid, imageId, options.getPreferredSpeciesListUrl)).done(function (resp) {
+                _preferredImageStatus = (resp != undefined && resp.length > 0 && resp[0].kvpValues.length > 0);
+                var mergedOptions = mergeOptions(options, targetDiv, imageId);
+                initViewer(mergedOptions);
+            });
+        } else if (preferredImageStatus != undefined) {
+            _preferredImageStatus = preferredImageStatus;
+            var mergedOptions = mergeOptions(options, targetDiv, imageId);
+            initViewer(mergedOptions);
+        }
+
     };
 
     lib.resizeViewer = function(targetDiv) {
@@ -122,6 +134,27 @@ var imgvwr = {};
         return mergedOptions;
     }
 
+    function checkSpeciesImage(guid, imageId, getPreferredSpeciesListUrl) {
+        return $.ajax( {
+            dataType: 'jsonp',
+            url: getPreferredSpeciesListUrl + "/ws/species/" + guid, //+ "?dr=drt1476827971152",
+            crossDomain: true
+        }).done(function(data) {
+            if (data) {
+                return data.find (function(obj) {
+                    return (obj.list.listName === 'ALA Preferred Species Images' &&
+                    obj.kvpValues.find(function (kvpValues) {
+                        return kvpValues.key =='imageId' && kvpValues.value == imageId
+                    }))
+                });
+            } else {
+                return undefined;
+            }
+        }).fail(function(){
+             return undefined;
+        });
+    }    
+    
     function initViewer(opts) {
         $.ajax( {
             dataType: 'jsonp',
@@ -424,7 +457,7 @@ var imgvwr = {};
                     $(container).html("<a id='btnPreferredImage' title='Add image to Preferred Species Images List' href='#'><span class='fa fa-star'></span></a>");
                     $(container).find("#btnPreferredImage").click(function (e) {
                         e.preventDefault();
-                        if (self.options.preferredImageStatus == "true") {
+                        if (self.options.preferredImageStatus) {
                             bootbox.alert("You cannot add this image as it has already been added to ALA Preffered Species Image List");
                         } else {
 
@@ -433,7 +466,7 @@ var imgvwr = {};
                                 success: function (data) {
                                     if (data.status == 200) {
                                         setPreferredButton(container);
-                                        self.options.preferredImageStatus == "true";
+                                        self.options.preferredImageStatus == true;
                                         bootbox.alert("This Image has been successfully added to ALA Preferred Species Image List");
                                     }
                                 },
@@ -444,7 +477,7 @@ var imgvwr = {};
                         }
                     });
 
-                    if (self.options.preferredImageStatus == "true") {
+                    if (self.options.preferredImageStatus) {
                         setPreferredButton(container);
                     }
 

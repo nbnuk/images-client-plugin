@@ -11,7 +11,7 @@ class SpeciesListWebService {
     def grailsApplication
 
     private String getServiceUrl() {
-        def url = grailsApplication.config.ala.speciesList.service.url?: "http://lists.ala.org.au"
+        def url = grailsApplication.config.speciesList.baseURL
         if (!url.endsWith("/")) {
             url += "/"
         }
