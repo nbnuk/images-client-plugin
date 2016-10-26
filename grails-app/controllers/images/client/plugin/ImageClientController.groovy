@@ -107,7 +107,7 @@ class ImageClientController {
         render text: list as grails.converters.JSON, contentType: ContentType.APPLICATION_JSON
     }
 
-    @AlaSecured(value = "ROLE_ADMIN")
+   // @AlaSecured(value = "ROLE_ADMIN")
     def saveImageToSpeciesList() {
         String userId = authService.getUserId()
         if (!userId) {
