@@ -111,7 +111,7 @@ class ImageClientController {
     def saveImageToSpeciesList() {
         String userId = authService.getUserId()
         if (!userId) {
-            render text: "You must be logged in and image id must be provided.", status: HttpStatus.SC_BAD_REQUEST
+            render text: "You must be logged in", status: HttpStatus.SC_BAD_REQUEST
         } else {
             if (params.id && params.scientificName) {
                 Map result = speciesListWebService.saveImageToSpeciesList(params.scientificName, params.id)

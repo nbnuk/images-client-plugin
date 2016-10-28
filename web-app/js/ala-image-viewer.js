@@ -67,8 +67,7 @@ var imgvwr = {};
         _viewer.measureControl.mmPerPixel = pixelLength;
     };
 
-  //  lib.viewImage = function(targetDiv, imageId, scientificName, preferredImageStatus, options) {
-    lib.viewImage = function(targetDiv, imageId, scientificName, preferredImageStatus, guid, options) {
+    lib.viewImage = function(targetDiv, imageId, scientificName, guid, options) {
         _imageId = imageId;
         _scientificName = scientificName;
         _preferredImageStatus = false;
@@ -79,17 +78,22 @@ var imgvwr = {};
             lib.setImageClientBaseUrl(options.imageClientBaseUrl);
         }
 
+        var checkSpeciesList = null;
+
         if (guid != undefined) {
-            $.when(checkSpeciesImage(guid, imageId, options.getPreferredSpeciesListUrl)).done(function (resp) {
-                _preferredImageStatus = (resp != undefined && resp.length > 0 && resp[0].kvpValues.length > 0);
-                var mergedOptions = mergeOptions(options, targetDiv, imageId);
-                initViewer(mergedOptions);
-            });
-        } else if (preferredImageStatus != undefined) {
-            _preferredImageStatus = preferredImageStatus;
+            checkSpeciesList = checkSpeciesImage(guid, imageId, options.getPreferredSpeciesListUrl)
+        } else if (scientificName != undefined) {
+            checkSpeciesList = checkSpeciesByNameImage(scientificName, imageId, options.getPreferredSpeciesListUrl)
+        }
+
+        // if checkSpeciesList is null, the promise is resolved immediately and resp is null: https://api.jquery.com/jquery.when/
+        $.when(checkSpeciesList).then(function (resp) {
+            if (resp != undefined) {
+                _preferredImageStatus = resp;
+            }
             var mergedOptions = mergeOptions(options, targetDiv, imageId);
             initViewer(mergedOptions);
-        }
+        });
 
     };
 
@@ -139,22 +143,43 @@ var imgvwr = {};
             dataType: 'jsonp',
             url: getPreferredSpeciesListUrl + "/ws/species/" + guid, //+ "?dr=drt1476827971152",
             crossDomain: true
-        }).done(function(data) {
+        }).then(function(data) {
             if (data) {
-                return data.find (function(obj) {
+                var result = data.find (function(obj) {
                     return (obj.list.listName === 'ALA Preferred Species Images' &&
                     obj.kvpValues.find(function (kvpValues) {
                         return kvpValues.key =='imageId' && kvpValues.value == imageId
                     }))
                 });
+                return (result != undefined)
             } else {
-                return undefined;
+                return false;
             }
-        }).fail(function(){
-             return undefined;
+        }, function(error){
+             return false;
         });
-    }    
-    
+    }
+
+    function checkSpeciesByNameImage(scientificName, imageId, getPreferredSpeciesListUrl) {
+        debugger;
+        return $.ajax( {
+            dataType: 'jsonp',
+            url: getPreferredSpeciesListUrl + "/ws/speciesListItem/getPreferredSpeciesImage",
+            crossDomain: true
+        }).then(function(data) {
+            if (data) {
+                var result = data.find(function (obj) {
+                    return (obj.name === scientificName && obj.imageId === imageId);
+                });
+                return (result != undefined)
+            } else {
+                return false;
+            }
+        }, function (error) {
+            return false;
+        });
+    }
+
     function initViewer(opts) {
         $.ajax( {
             dataType: 'jsonp',
@@ -458,7 +483,7 @@ var imgvwr = {};
                     $(container).find("#btnPreferredImage").click(function (e) {
                         e.preventDefault();
                         if (self.options.preferredImageStatus) {
-                            bootbox.alert("You cannot add this image as it has already been added to ALA Preffered Species Image List");
+                            showAlert("You cannot add this images as it has already been added to ALA Preferred Species Image List");
                         } else {
 
                             $.ajax({
@@ -467,11 +492,15 @@ var imgvwr = {};
                                     if (data.status == 200) {
                                         setPreferredButton(container);
                                         self.options.preferredImageStatus == true;
-                                        bootbox.alert("This Image has been successfully added to ALA Preferred Species Image List");
+                                        showAlert("This Image has been successfully added to ALA Preferred Species Image List");
                                     }
                                 },
                                 error: function (data) {
-                                    bootbox.alert("An error occurred while saving metadata to image. " + data.responseText);
+                                    if (data.status == 400 || data.status == 500 ) {
+                                        showAlert("An error occurred while saving metadata to image. " + data.responseText);
+                                    } else {
+                                        showAlert("An error occurred while saving metadata to image.");
+                                    }
                                 }
                             })
                         }
@@ -749,6 +778,32 @@ var imgvwr = {};
                 e.which = 39; // # Some key code value
                 $(document).trigger(e);
             });
+        }
+    }
+
+    /*
+    Define this div if bootbox is not working properly. 
+    for eg: show.gsp in bie-plugin
+    
+     <div id="alertModal" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div id="alertContent"></div>
+                    <!-- dialog buttons -->
+                    <div class="modal-footer"><button type="button" class="btn btn-primary" data-dismiss="modal">OK</button></div>
+                </div>
+            </div><!-- /.modal-content -->
+         </div><!-- /.modal-dialog -->
+     </div>
+     */
+    function showAlert(alertMsg) {
+        // if alertModal and alertContent is defined
+        if ($("#alertModal").length && $("#alertContent").length) {
+            $('#alertContent').text(alertMsg);
+            $('#alertModal').modal('show');
+        } else {
+            bootbox.alert(alertMsg)
         }
     }
 
