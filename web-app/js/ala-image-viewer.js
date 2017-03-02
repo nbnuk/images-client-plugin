@@ -125,7 +125,7 @@ var imgvwr = {};
             lib.setImageClientBaseUrl(options.imageClientBaseUrl);
         }
 
-        if (opts.addPreferenceButton) {
+        if (options.addPreferenceButton) {
             var checkSpeciesList = null;
 
             if (guid != undefined) {
