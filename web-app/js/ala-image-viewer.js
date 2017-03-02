@@ -222,7 +222,7 @@ var imgvwr = {};
         $.ajax( {
             dataType: 'jsonp',
             url: getPreferredSpeciesListUrl + "/ws/speciesListItem/getPreferredSpeciesImage",
-            timeout:3000,
+            timeout:2000,
             crossDomain: true,
             error: function(jqXHR, textStatus, errorThrown) {
                promise.resolve(false);
@@ -237,8 +237,6 @@ var imgvwr = {};
             } else {
                 promise.resolve(false)
              }
-        }, function(error) {
-            promise.resolve(false);
         });
         return promise;
     }
