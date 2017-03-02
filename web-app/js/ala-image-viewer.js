@@ -125,23 +125,24 @@ var imgvwr = {};
             lib.setImageClientBaseUrl(options.imageClientBaseUrl);
         }
 
-        var checkSpeciesList = null;
+        if (opts.addPreferenceButton) {
+            var checkSpeciesList = null;
 
-        if (guid != undefined) {
-            checkSpeciesList = checkSpeciesImage(guid, imageId, options.getPreferredSpeciesListUrl)
-        } else if (scientificName != undefined) {
-            checkSpeciesList = checkSpeciesByNameImage(scientificName, imageId, options.getPreferredSpeciesListUrl)
-        }
-
-        // if checkSpeciesList is null, the promise is resolved immediately and resp is null: https://api.jquery.com/jquery.when/
-        $.when(checkSpeciesList).then(function (resp) {
-            if (resp != undefined) {
-                _preferredImageStatus = resp;
+            if (guid != undefined) {
+                checkSpeciesList = checkSpeciesImage(guid, imageId, options.getPreferredSpeciesListUrl)
+            } else if (scientificName != undefined) {
+                checkSpeciesList = checkSpeciesByNameImage(scientificName, imageId, options.getPreferredSpeciesListUrl)
             }
-            var mergedOptions = mergeOptions(options, targetDiv, imageId);
-            initViewer(mergedOptions);
-        });
 
+            // if checkSpeciesList is null, the promise is resolved immediately and resp is null: https://api.jquery.com/jquery.when/
+            $.when(checkSpeciesList).then(function (resp) {
+                if (resp != undefined) {
+                    _preferredImageStatus = resp;
+                }
+                var mergedOptions = mergeOptions(options, targetDiv, imageId);
+                initViewer(mergedOptions);
+            });
+        }
     };
 
     lib.resizeViewer = function(targetDiv) {
@@ -203,7 +204,7 @@ var imgvwr = {};
                 return false;
             }
         }, function(error){
-             return false;
+             return false; // never triggered if using JSONP
         });
     }
 
