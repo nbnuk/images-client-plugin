@@ -13,6 +13,7 @@ class ImageClientController {
 
     def imagesWebService
     def speciesListWebService
+    def bieWebService
     def authService
 
     def createSubImage(){
@@ -111,17 +112,16 @@ class ImageClientController {
     def saveImageToSpeciesList() {
         String userId = authService.getUserId()
         if (!userId) {
-            render text: "You must be logged in", status: HttpStatus.SC_BAD_REQUEST
+            render status: HttpStatus.SC_BAD_REQUEST, text: "You must be logged in"
         } else {
             if (params.id && params.scientificName) {
-                Map result = speciesListWebService.saveImageToSpeciesList(params.scientificName, params.id)
-                if (!result.error) {
-                    render text: result as grails.converters.JSON, contentType: ContentType.APPLICATION_JSON
-                } else {
-                    render text: result.error, status: HttpStatus.SC_INTERNAL_SERVER_ERROR
+                def result = speciesListWebService.saveImageToSpeciesList(params.scientificName, params.id)
+                if (result.status == 200) {
+                    result = bieWebService.updateBieIndex(result.data)
                 }
+                render status: result.status, text: result.text
             } else {
-                render text: "Something went wrong. Please refresh and try again.", status: HttpStatus.SC_BAD_REQUEST
+                render status: HttpStatus.SC_BAD_REQUEST, text: "Save image to species list failed. Missing parameter id or scientific name. This should not happen. Please refresh and try again."
             }
         }
     }

@@ -1,10 +1,10 @@
 package images.client.plugin
 
-import groovy.json.JsonBuilder
+import grails.converters.JSON
 import groovy.json.JsonSlurper
-import groovyx.net.http.ContentType
-import groovyx.net.http.HTTPBuilder
-import groovyx.net.http.Method
+import org.apache.commons.httpclient.HttpClient
+import org.apache.commons.httpclient.methods.PostMethod
+import org.apache.commons.httpclient.methods.StringRequestEntity
 
 class SpeciesListWebService {
 
@@ -23,7 +23,7 @@ class SpeciesListWebService {
         def params = [:]
         params.scientificName = scientificName
         params.imageId = imageId
-        def results = postJSON(url, params)
+        def results = doPostJSON(url, params)
         return results
     }
 
@@ -33,39 +33,30 @@ class SpeciesListWebService {
         return results
     }
 
-    static def postJSON(url, Map params) {
-        def result = [:]
-        HTTPBuilder builder = new HTTPBuilder(url)
-        builder.request(Method.POST, ContentType.JSON) {request ->
+    def doPostJSON(String url, Map postBody) {
 
-            body = new JsonBuilder(params).toString()
+        def response = [:]
+        try {
+            HttpClient client = new HttpClient();
+            PostMethod post = new PostMethod(url);
 
-            response.success = {resp ->
-                result.status = resp.status
-            }
+            StringRequestEntity requestEntity = new StringRequestEntity((postBody as JSON).toString(), "application/json", "utf-8")
 
-            response.failure = {resp ->
-                def message = ""
-                switch (resp.status){
-                    case 400:
-                        message = "Missing required field: rawScientificName or imageId"
-                        break
-                    case 404:
-                        message = "Species could not be found"
-                        break
-                    case 412:
-                        message = "ALA Preferred Image Species List has not been setup"
-                        break
-                    case 500:
-                        message = "Could not create SpeciesListItem"
-                        break
-                }
-                result.status = resp.status
-                result.error = message
-            }
+            post.setRequestEntity(requestEntity)
+            client.executeMethod(post);
+            String responseStr = post.getResponseBodyAsString();
+            response = JSON.parse(responseStr)
 
+        } catch (SocketTimeoutException e) {
+            def error = [text: "Timed out calling web service. URL= ${url}."]
+            log.error(error, e)
+            response = [text: error, status: 500 ]
+        } catch (Exception e) {
+            def error = [text: "Failed calling web service. ${e.getMessage()} URL= ${url}."]
+            log.error(error, e)
+            response = [text: error, status: 500]
         }
-        result
+        return response
     }
 
     def getJSON(String url) {

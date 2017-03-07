@@ -135,10 +135,14 @@ var imgvwr = {};
             }
 
             // if checkSpeciesList is null, the promise is resolved immediately and resp is null: https://api.jquery.com/jquery.when/
-            $.when(checkSpeciesList).done(function (resp) {
+            $.when(checkSpeciesList).then(function (resp) {
                 if (resp != undefined) {
                     _preferredImageStatus = resp;
                 }
+                var mergedOptions = mergeOptions(options, targetDiv, imageId);
+                initViewer(mergedOptions);
+            }, function(error) {
+                options.addPreferenceButton = false;
                 var mergedOptions = mergeOptions(options, targetDiv, imageId);
                 initViewer(mergedOptions);
             });
@@ -192,52 +196,56 @@ var imgvwr = {};
     function checkSpeciesImage(guid, imageId, getPreferredSpeciesListUrl) {
         var promise = $.Deferred();
         $.ajax( {
-            dataType: 'jsonp',
+            dataType: 'json',
             url: getPreferredSpeciesListUrl + "/ws/species/" + guid, //+ "?dr=drt1476827971152",
-            timeout:3000,
-            crossDomain: true,
+            type: 'get',
+            timeout:5000,
+            success: function (data) {
+                if (data) {
+                    var result = data.find (function(obj) {
+                        return (obj.list.listName === 'ALA Preferred Species Images' &&
+                        obj.kvpValues.find(function (kvpValues) {
+                            return kvpValues.key =='imageId' && kvpValues.value == imageId
+                        }))
+                    });
+                    promise.resolve(result != undefined)
+                } else {
+                    promise.resolve(false)
+                }
+            },
             error: function(jqXHR, textStatus, errorThrown) {
-                promise.resolve(false);
+                console.error ("Error when calling " + getPreferredSpeciesListUrl + "/ws/species/" + guid + " (" + errorThrown + ")");
+                promise.reject(jqXHR, textStatus, errorThrown);
                 return promise;
             }
-        }).done(function(data) {
-            if (data) {
-                var result = data.find (function(obj) {
-                    return (obj.list.listName === 'ALA Preferred Species Images' &&
-                    obj.kvpValues.find(function (kvpValues) {
-                        return kvpValues.key =='imageId' && kvpValues.value == imageId
-                    }))
-                });
-                promise.resolve(result != undefined)
-            } else {
-                promise.resolve(false)
-            }
-        });
+        })
         return promise;
 
     }
 
     function checkSpeciesByNameImage(scientificName, imageId, getPreferredSpeciesListUrl) {
         var promise = $.Deferred();
+        debugger;
         $.ajax( {
-            dataType: 'jsonp',
+            dataType: 'json',
             url: getPreferredSpeciesListUrl + "/ws/speciesListItem/getPreferredSpeciesImage",
-            timeout:3000,
-            crossDomain: true,
+            type: 'get',
+            timeout:5000,
+            success: function (data) {
+                if (data) {
+                    var result = data.find(function (obj) {
+                        return (obj.name === scientificName && obj.imageId === imageId);
+                    });
+                    promise.resolve(result != undefined)
+                } else {
+                    promise.resolve(false)
+                }
+            },
             error: function(jqXHR, textStatus, errorThrown) {
-               promise.resolve(false);
-               return promise;
-            }
-        }).done(function(data) {
-            if (data) {
-                var result = data.find(function (obj) {
-                    return (obj.name === scientificName && obj.imageId === imageId);
-                 });
-                 promise.resolve(result != undefined)
-            } else {
-                promise.resolve(false)
-             }
-        });
+                console.error ("Error when calling " + getPreferredSpeciesListUrl + "/ws/speciesListItem/getPreferredSpeciesImage (" + errorThrown + ")");
+                promise.reject(jqXHR, textStatus, errorThrown);
+                return promise;
+            }});
         return promise;
     }
 
@@ -546,7 +554,6 @@ var imgvwr = {};
                         if (self.options.preferredImageStatus) {
                             showAlert("You cannot add this images as it has already been added to ALA Preferred Species Image List");
                         } else {
-
                             $.ajax({
                                 url: self.options.savePreferredSpeciesListUrl,
                                 success: function (data) {
@@ -557,11 +564,7 @@ var imgvwr = {};
                                     }
                                 },
                                 error: function (data) {
-                                    if (data.status == 400 || data.status == 500 ) {
-                                        showAlert("An error occurred while saving metadata to image. " + data.responseText);
-                                    } else {
-                                        showAlert("An error occurred while saving metadata to image.");
-                                    }
+                                    showAlert("An error occurred while saving metadata to image. Status: " + data.status + " Reason: " + data.responseText);
                                 }
                             })
                         }
