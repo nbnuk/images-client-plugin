@@ -39,6 +39,7 @@ imgvwr.viewImage($("#viewerContainerId"), imageId, {custom options...});
 | addCloseButton | false | Add a control to dismiss bootstrap modal dialog.
 | addAttribution | false | Add a control to show image attribution. The text to show is passed on 'attribution' option.
 | attribution | '' | Text to show on attribution control. Make sure 'addAttribution' option is switched on.
+| addPreferrenceButton | false | Disabled if user is not ALA admin
 | addLikeDislikeButton | false | Add button to up and down vote and a help button.
 | disableLikeDislikeButton | false | Disable up and down vote buttons when user is not logged in.
 | likeUrl | '' | Url to call when a user up vote an image.
@@ -168,6 +169,7 @@ TODO
 
 * **version 0.7** (14/06/2016)
   * Added feature to up and down vote an image.
+  * Added feature to nominate image as ALA Preffered image. ImageController will update ALA Preferred species list and once    successful, it will update the Bie Index. grailsApplication.config.speciesList.baseURL and grailsApplication.config.bieService.baseUrl needs to be present in the config properties file of the application.  
 
 * **version 0.6.1** (15/06/2015)
   * Bugfix for img thumbnail carousel.
