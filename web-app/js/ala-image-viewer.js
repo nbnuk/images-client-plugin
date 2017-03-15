@@ -225,7 +225,6 @@ var imgvwr = {};
 
     function checkSpeciesByNameImage(scientificName, imageId, getPreferredSpeciesListUrl) {
         var promise = $.Deferred();
-        debugger;
         $.ajax( {
             dataType: 'json',
             url: getPreferredSpeciesListUrl + "/ws/speciesListItem/getPreferredSpeciesImage",
