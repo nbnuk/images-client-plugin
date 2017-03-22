@@ -87,7 +87,6 @@ var imgvwr = {};
         ' Image does not support the identification of the species, subject is unclear and identifying features are difficult to see or not visible.<br/></div>',
         savePreferredSpeciesListUrl: '',
         getPreferredSpeciesListUrl: '',
-        getSpeciesListKvpUrl: '',
         druid: '',
         galleryOptions: {
             enableGalleryMode: false,
@@ -133,7 +132,7 @@ var imgvwr = {};
             if (guid != undefined) {
                 checkSpeciesList = checkSpeciesImage(guid, imageId, options.druid, options.getPreferredSpeciesListUrl)
             } else if (scientificName != undefined) {
-                checkSpeciesList = checkSpeciesByNameImage(scientificName, imageId, options.getSpeciesListKvpUrl)
+                checkSpeciesList = checkSpeciesByNameImage(scientificName, imageId, options.getPreferredSpeciesListUrl)
             }
 
             // if checkSpeciesList is null, the promise is resolved immediately and resp is null: https://api.jquery.com/jquery.when/
@@ -225,11 +224,11 @@ var imgvwr = {};
 
     }
 
-    function checkSpeciesByNameImage(scientificName, imageId, getSpeciesListKvpUrl) {
+    function checkSpeciesByNameImage(scientificName, imageId, getPreferredSpeciesListUrl) {
         var promise = $.Deferred();
         $.ajax( {
             dataType: 'json',
-            url: getSpeciesListKvpUrl,
+            url: getPreferredSpeciesListUrl,
             type: 'get',
             timeout:8000,
             success: function (data) {
@@ -243,7 +242,7 @@ var imgvwr = {};
                 }
             },
             error: function(jqXHR, textStatus, errorThrown) {
-                console.error ("Error when calling " + getSpeciesListKvpUrl + "(" + errorThrown + ")");
+                console.error ("Error when calling " + getPreferredSpeciesListUrl + "(" + errorThrown + ")");
                 promise.reject(jqXHR, textStatus, errorThrown);
                 return promise;
             }});
