@@ -32,25 +32,31 @@ class SpeciesListWebService {
     @Cacheable("speciesListKvp")
     def getPreferredImageSpeciesList() {
         String druid = getSpeciesListDruid()
-        def url = getServiceUrl() + "ws/speciesListItemKvp/" + druid
-        def results = getJSON(url)
+        String url = getServiceUrl() + "ws/speciesListItemKvp/" + druid
+        List speciesListKvps = getJSON(url)
+        List results = []
+        speciesListKvps.each {
+            String imageId = ""
+            it.kvps?.each { kvp ->
+                if (kvp.key == "imageId") {
+                    imageId = kvp.value?:""
+                }}
+            if (imageId.trim() != "") {
+                results.push(["name": it.name, "imageId": imageId])
+            }
+        }
         return results
     }
 
     @CacheEvict(value="speciesListKvp", allEntries=true)
     def saveImageToSpeciesList(def scientificName, def imageId, cookie) {
-
         String druid = getSpeciesListDruid ()
         String listNameVal = getSpeciesListName ()
-
-        def url = getServiceUrl() + "ws/speciesList/" + druid
-
-        def kvpValues = [[key: "imageId", value: imageId]]
-
-        def listMap = [
+        String url = getServiceUrl() + "ws/speciesList/" + druid
+        List kvpValues = [[key: "imageId", value: imageId]]
+        Map listMap = [
                 itemName: scientificName, kvpValues: kvpValues
         ]
-
         def builder = new JSONBuilder()
         def jsonBody = builder.build {
             listName = listNameVal
@@ -63,7 +69,6 @@ class SpeciesListWebService {
     }
 
     def doPostJSON(String url, def jsonBody, def cookie) {
-
         def response = [:]
         try {
             HttpClient client = new HttpClient();
