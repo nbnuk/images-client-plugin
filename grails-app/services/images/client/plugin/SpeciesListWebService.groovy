@@ -1,10 +1,13 @@
 package images.client.plugin
 
 import grails.converters.JSON
+import grails.web.JSONBuilder
 import groovy.json.JsonSlurper
 import org.apache.commons.httpclient.HttpClient
 import org.apache.commons.httpclient.methods.PostMethod
 import org.apache.commons.httpclient.methods.StringRequestEntity
+import org.springframework.cache.annotation.Cacheable
+import org.springframework.cache.annotation.CacheEvict
 
 class SpeciesListWebService {
 
@@ -18,30 +21,55 @@ class SpeciesListWebService {
         return url
     }
 
-    def saveImageToSpeciesList(def scientificName, def imageId) {
-        def url = getServiceUrl() + "ws/speciesListItem/preferredSpeciesImage"
-        def params = [:]
-        params.scientificName = scientificName
-        params.imageId = imageId
-        def results = doPostJSON(url, params)
-        return results
+    private getSpeciesListDruid() {
+        return grailsApplication.config.speciesList.preferredSpeciesListDruid ? grailsApplication.config.speciesList.preferredSpeciesListDruid : "dr4778"
     }
 
+    private getSpeciesListName() {
+        return grailsApplication.config.speciesList.preferredListName ? grailsApplication.config.speciesList.preferredListName : "ALA Preferred Species Images"
+    }
+
+    @Cacheable("speciesListKvp")
     def getPreferredImageSpeciesList() {
-        def url = getServiceUrl() + "ws/speciesListItem/getPreferredSpeciesImage"
+        String druid = getSpeciesListDruid()
+        def url = getServiceUrl() + "ws/speciesListItemKvp/" + druid
         def results = getJSON(url)
         return results
     }
 
-    def doPostJSON(String url, Map postBody) {
+    @CacheEvict(value="speciesListKvp", allEntries=true)
+    def saveImageToSpeciesList(def scientificName, def imageId, cookie) {
+
+        String druid = getSpeciesListDruid ()
+        String listNameVal = getSpeciesListName ()
+
+        def url = getServiceUrl() + "ws/speciesList/" + druid
+
+        def kvpValues = [[key: "imageId", value: imageId]]
+
+        def listMap = [
+                itemName: scientificName, kvpValues: kvpValues
+        ]
+
+        def builder = new JSONBuilder()
+        def jsonBody = builder.build {
+            listName = listNameVal
+            listItems = [listMap]
+            replaceList = false
+        }
+        def response = doPostJSON(url, jsonBody, cookie)
+        def result = [status: response.status, text: response.message, data: response.data]
+        return result
+    }
+
+    def doPostJSON(String url, def jsonBody, def cookie) {
 
         def response = [:]
         try {
             HttpClient client = new HttpClient();
             PostMethod post = new PostMethod(url);
-
-            StringRequestEntity requestEntity = new StringRequestEntity((postBody as JSON).toString(), "application/json", "utf-8")
-
+            post.setRequestHeader('cookie',cookie)
+            StringRequestEntity requestEntity = new StringRequestEntity(jsonBody.toString(), "application/json", "utf-8")
             post.setRequestEntity(requestEntity)
             client.executeMethod(post);
             String responseStr = post.getResponseBodyAsString();
@@ -65,8 +93,8 @@ class SpeciesListWebService {
             def text = u.text
             return new JsonSlurper().parseText(text)
         } catch (Exception ex) {
-            System.err.println(url)
-            System.err.println(ex.message)
+            log.error(url)
+            log.error(ex.message)
             return null
         }
     }

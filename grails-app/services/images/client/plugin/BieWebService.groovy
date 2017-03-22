@@ -1,8 +1,9 @@
 package images.client.plugin
 
 import grails.converters.JSON
-import groovyx.net.http.HTTPBuilder
-import org.springframework.http.HttpStatus
+import org.apache.commons.httpclient.HttpClient
+import org.apache.commons.httpclient.methods.PostMethod
+import org.apache.commons.httpclient.methods.StringRequestEntity
 
 /**
  * Created by koh032 on 2/03/2017.
@@ -19,32 +20,48 @@ class BieWebService {
     }
 
     def updateBieIndex(def guidImageList) {
-        def response
+
 
         List<Map> list = []
         guidImageList.each{
-            list.push ([guid: it.value])
-        }
-        def http = new HTTPBuilder(getServiceUrl() + "updateImages")
-        http.setHeaders(["Authorization": grailsApplication.config.bieApiKey])
-        def jsonBody = (list as JSON).toString()
-        try {
-            def result =  http.post(body: jsonBody, requestContentType:groovyx.net.http.ContentType.JSON)
-            def status
-            if (result && result.success) {
-                status = HttpStatus.OK
-                log.info("Successfully updated Bie: " + jsonBody)
-            } else {
-                status = HttpStatus.INTERNAL_SERVER_ERROR
-                log.info("Fail to update Bie with status ${status} with the param: " + jsonBody)
+            def imageKvp = it.kvps?.find { kvp ->
+                kvp.key == 'imageId'
             }
-            response = [status: status, text: result.message]
-
-        } catch(ex) {
-            log.error("Unable to obtain species details from BIE - " + ex.getMessage(), ex)
-            response = [status: 500, text: ex.getMessage()]
+            String imageId = imageKvp?.value ? imageKvp.value : ''
+            list.push ([guid: it.guid, image: imageId])
         }
-        response
+        String url = getServiceUrl() + "updateImages"
+        String jsonBody = (list as JSON).toString()
+        def response = [:]
+        try {
+            HttpClient client = new HttpClient();
+            PostMethod post = new PostMethod(url);
+           // post.setRequestHeader('Cookie', cookie.toString())
+            post.setRequestHeader('Authorization', grailsApplication.config.bieApiKey)
+            StringRequestEntity requestEntity = new StringRequestEntity(jsonBody, "application/json", "utf-8")
+            post.setRequestEntity(requestEntity)
+            int status = client.executeMethod(post);
+            String responseStr = post.getResponseBodyAsString();
+
+            if (!responseStr && status != 200) {
+                response = [text: "Error occurred while calling Bie update Images" + responseStr, status: status ]
+            } else {
+                response = [text: "Bie updated successfully", status: status ]
+            }
+            log.info (text: response, status: status)
+
+        } catch (SocketTimeoutException e) {
+            def error = [text: "Timed out calling web service. URL= ${url}."]
+            log.error(error, e)
+            response = [text: error, status: 500 ]
+        } catch (Exception e) {
+            def error = [text: "Failed calling web service. ${e.getMessage()} URL= ${url}."]
+            log.error(error, e)
+            response = [text: error, status: 500]
+        }
+        return response
+
+
     }
 
 }

@@ -87,6 +87,8 @@ var imgvwr = {};
         ' Image does not support the identification of the species, subject is unclear and identifying features are difficult to see or not visible.<br/></div>',
         savePreferredSpeciesListUrl: '',
         getPreferredSpeciesListUrl: '',
+        getSpeciesListKvpUrl: '',
+        druid: '',
         galleryOptions: {
             enableGalleryMode: false,
             closeControlContent: null,
@@ -129,9 +131,9 @@ var imgvwr = {};
             var checkSpeciesList = null;
 
             if (guid != undefined) {
-                checkSpeciesList = checkSpeciesImage(guid, imageId, options.getPreferredSpeciesListUrl)
+                checkSpeciesList = checkSpeciesImage(guid, imageId, options.druid, options.getPreferredSpeciesListUrl)
             } else if (scientificName != undefined) {
-                checkSpeciesList = checkSpeciesByNameImage(scientificName, imageId, options.getPreferredSpeciesListUrl)
+                checkSpeciesList = checkSpeciesByNameImage(scientificName, imageId, options.getSpeciesListKvpUrl)
             }
 
             // if checkSpeciesList is null, the promise is resolved immediately and resp is null: https://api.jquery.com/jquery.when/
@@ -193,20 +195,20 @@ var imgvwr = {};
         return mergedOptions;
     }
 
-    function checkSpeciesImage(guid, imageId, getPreferredSpeciesListUrl) {
+    function checkSpeciesImage(guid, imageId, druid, getPreferredSpeciesListUrl) {
         var promise = $.Deferred();
         $.ajax( {
             dataType: 'json',
-            url: getPreferredSpeciesListUrl + "/ws/species/" + guid, //+ "?dr=drt1476827971152",
+            url: getPreferredSpeciesListUrl + "/ws/species/" + guid + "?dr=" + druid, //+ "?dr=drt1476827971152",
             type: 'get',
-            timeout:5000,
+            timeout:8000,
             success: function (data) {
                 if (data) {
                     var result = data.find (function(obj) {
-                        return (obj.list.listName === 'ALA Preferred Species Images' &&
-                        obj.kvpValues.find(function (kvpValues) {
-                            return kvpValues.key =='imageId' && kvpValues.value == imageId
-                        }))
+                        return (
+                            obj.kvpValues.find(function (kvpValues) {
+                                return kvpValues.key =='imageId' && kvpValues.value == imageId
+                            }))
                     });
                     promise.resolve(result != undefined)
                 } else {
@@ -214,7 +216,7 @@ var imgvwr = {};
                 }
             },
             error: function(jqXHR, textStatus, errorThrown) {
-                console.error ("Error when calling " + getPreferredSpeciesListUrl + "/ws/species/" + guid + " (" + errorThrown + ")");
+                console.error ("Error when calling " + getPreferredSpeciesListUrl + "/ws/species/" + guid + "?dr=" + druid + "(" + errorThrown + ")");
                 promise.reject(jqXHR, textStatus, errorThrown);
                 return promise;
             }
@@ -223,13 +225,13 @@ var imgvwr = {};
 
     }
 
-    function checkSpeciesByNameImage(scientificName, imageId, getPreferredSpeciesListUrl) {
+    function checkSpeciesByNameImage(scientificName, imageId, getSpeciesListKvpUrl) {
         var promise = $.Deferred();
         $.ajax( {
             dataType: 'json',
-            url: getPreferredSpeciesListUrl + "/ws/speciesListItem/getPreferredSpeciesImage",
+            url: getSpeciesListKvpUrl,
             type: 'get',
-            timeout:5000,
+            timeout:8000,
             success: function (data) {
                 if (data) {
                     var result = data.find(function (obj) {
@@ -241,7 +243,7 @@ var imgvwr = {};
                 }
             },
             error: function(jqXHR, textStatus, errorThrown) {
-                console.error ("Error when calling " + getPreferredSpeciesListUrl + "/ws/speciesListItem/getPreferredSpeciesImage (" + errorThrown + ")");
+                console.error ("Error when calling " + getSpeciesListKvpUrl + "(" + errorThrown + ")");
                 promise.reject(jqXHR, textStatus, errorThrown);
                 return promise;
             }});

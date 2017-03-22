@@ -108,22 +108,23 @@ class ImageClientController {
         render text: list as grails.converters.JSON, contentType: ContentType.APPLICATION_JSON
     }
 
-   // @AlaSecured(value = "ROLE_ADMIN")
     def saveImageToSpeciesList() {
+        def result = [:]
         String userId = authService.getUserId()
         if (!userId) {
             render status: HttpStatus.SC_BAD_REQUEST, text: "You must be logged in"
         } else {
             if (params.id && params.scientificName) {
-                def result = speciesListWebService.saveImageToSpeciesList(params.scientificName, params.id)
+                def cookies = request.getHeader('Cookie')
+                result = speciesListWebService.saveImageToSpeciesList(params.scientificName, params.id, cookies)
                 if (result.status == 200) {
                     result = bieWebService.updateBieIndex(result.data)
                 }
-                render status: result.status, text: result.text
             } else {
-                render status: HttpStatus.SC_BAD_REQUEST, text: "Save image to species list failed. Missing parameter id or scientific name. This should not happen. Please refresh and try again."
+                result = [status: HttpStatus.SC_BAD_REQUEST, text: "Save image to species list failed. Missing parameter id or scientific name. This should not happen. Please refresh and try again."]
             }
         }
+        render text: result as grails.converters.JSON, contentType: ContentType.APPLICATION_JSON
     }
 
     def likeImage() {
