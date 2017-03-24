@@ -21,20 +21,6 @@ log4j = {
            'net.sf.ehcache.hibernate'
 }
 
-grails.cache.config = {
-
-    defaults {
-        eternal false
-        overflowToDisk false
-        maxElementsInMemory 20000
-        timeToLiveSeconds 3600
-    }
-    cache {
-        name 'speciesListKvp'
-        timeToLiveSeconds 3600 // 1 hour
-    }
-}
-
 // Uncomment and edit the following lines to start using Grails encoding & escaping improvements
 
 /* remove this line 

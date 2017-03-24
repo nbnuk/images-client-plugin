@@ -33,6 +33,7 @@ class SpeciesListWebService {
     def getPreferredImageSpeciesList() {
         String druid = getSpeciesListDruid()
         String url = getServiceUrl() + "ws/speciesListItemKvp/" + druid
+        log.info("Calling species list web service: " + getServiceUrl() + "ws/speciesListItemKvp/" + druid)
         List speciesListKvps = getJSON(url)
         List results = []
         speciesListKvps.each {
