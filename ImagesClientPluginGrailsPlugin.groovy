@@ -42,40 +42,24 @@ class ImagesClientPluginGrailsPlugin {
     def doWithSpring = {
 
         if (!application.config.grails.cache.config) {
-            application.config.grails.cache.config = {
+            application.config.grails.cache.config = {}
+        }
 
-                defaults {
-                    eternal false
-                    overflowToDisk false
-                    maxElementsInMemory 20000
-                    timeToLiveSeconds 3600
-                }
+        application.config.grails.cache.config = application.config.grails.cache.config << {
 
-                cache {
-                    name 'speciesListKvp'
-                    eternal false
-                    overflowToDisk false
-                    maxElementsInMemory 20000
-                    timeToLiveSeconds 360
-                }
+            defaults {
+                eternal false
+                overflowToDisk false
+                maxElementsInMemory 20000
+                timeToLiveSeconds 3600
             }
-        } else {
-            application.config.grails.cache.config = application.config.grails.cache.config << {
 
-                defaults {
-                    eternal false
-                    overflowToDisk false
-                    maxElementsInMemory 20000
-                    timeToLiveSeconds 3600
-                }
-
-                cache {
-                    name 'speciesListKvp'
-                    eternal false
-                    overflowToDisk false
-                    maxElementsInMemory 20000
-                    timeToLiveSeconds 360
-                }
+            cache {
+                name 'speciesListKvp'
+                eternal false
+                overflowToDisk false
+                maxElementsInMemory 20000
+                timeToLiveSeconds(3600 * 2) // 2 hours
             }
         }
 
