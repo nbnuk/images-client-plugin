@@ -162,7 +162,6 @@ var defaultOptions = {
 All those can be overridden when creating the `GalleryWidget` instance.
 
 ### Configuration
-The following configurations are used by Image Plugin to be able to nominate an image as the preferred image for the species in BIE
 | Config | Description
 | ------ | -----------
 | speciesList.baseURL | SpeciesList BaseURL (eg: https://lists.ala.org.au)
