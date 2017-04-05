@@ -180,7 +180,7 @@ TODO
 
 * **version 0.7** (14/06/2016)
   * Added feature to up and down vote an image.
-  * Added feature to nominate image as ALA Preffered image. ImageController will update ALA Preferred species list and once    successful, it will update the Bie Index. Please see the configuration section related to enable this feature to work properly. 
+  * Added feature to nominate image as ALA Preffered image. ImageController will update ALA Preferred species list and once    successful, it will update the Bie Index. Please see the configuration section for this feature to work properly. 
 
 * **version 0.6.1** (15/06/2015)
   * Bugfix for img thumbnail carousel.
