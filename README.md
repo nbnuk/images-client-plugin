@@ -51,7 +51,7 @@ imgvwr.viewImage($("#viewerContainerId"), imageId, {custom options...});
 ### Viewer public methods
 | Method | Description
 | ------ | -----------
-| viewImage(targetDiv, imageId, options) | targetDiv has to be wrapped in a jQuery selector.
+| viewImage(targetDiv, imageId, scientificName, guid, options) | targetDiv has to be wrapped in a jQuery selector.
 | resizeViewer(targetDiv) | required when viewer container is initially hidden or its size changes.
 | removeCurrentImage() | Removes current image layer. Use case example: when reuisng viewer instance in a popup you don't want the previous image to show up while the image you have requested is being loaded.
 | getViewerInstance() | Provides the leaflet map/image viewer instance in case you need to perform some customizations.
@@ -161,6 +161,18 @@ var defaultOptions = {
 
 All those can be overridden when creating the `GalleryWidget` instance.
 
+### Configuration
+The following configurations are used by Image Plugin to be able to nominate an image as the preferred image for the species in BIE
+| Config | Description
+| ------ | -----------
+| speciesList.baseURL | SpeciesList BaseURL (eg: https://lists.ala.org.au)
+| bieService.baseUrl | Bie Index BaseURL (eg: http://bie.ala.org.au/ws)
+| speciesList.preferredSpeciesListDruid | Preferred Species List Druid (eg: dr4778)
+| speciesList.preferredListName | Preferred Species List Name (eg: ALA Preferred Species Images)
+| allowedImageEditingRoles | User roles for users to be able to nominate preferred image for species. (eg: ROLE_ADMIN,ROLE_USER)
+
+
+
 ### Bootstrap 3 modal dialog use case
 TODO
 
@@ -169,7 +181,7 @@ TODO
 
 * **version 0.7** (14/06/2016)
   * Added feature to up and down vote an image.
-  * Added feature to nominate image as ALA Preffered image. ImageController will update ALA Preferred species list and once    successful, it will update the Bie Index. grailsApplication.config.speciesList.baseURL and grailsApplication.config.bieService.baseUrl needs to be present in the config properties file of the application.  
+  * Added feature to nominate image as ALA Preffered image. ImageController will update ALA Preferred species list and once    successful, it will update the Bie Index. Please see the configuration section related to enable this feature to work properly. 
 
 * **version 0.6.1** (15/06/2015)
   * Bugfix for img thumbnail carousel.
