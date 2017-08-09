@@ -35,12 +35,14 @@ modules = {
         resource url: [plugin: "images-client-plugin", dir: 'js/audiojs', file: 'audio.min.js']
     }
 
+    // assets pipeline replaces this module with ala/images-client.js and ala/images-client.css
     'image-viewer' {
         dependsOn 'jquery', 'bootstrap', 'leaflet', 'leaflet-fullscreen', 'leaflet-measure', 'leaflet-draw', 'leaflet-loading', 'font-awesome'
         resource url: [plugin: "images-client-plugin", dir: 'js', file: 'ala-image-viewer.js']
         resource url: [plugin: "images-client-plugin", dir: 'js', file: 'bootbox.min.js']
     }
 
+    // assets pipeline replaces this module with ala/images-client-gallery.js and ala/images-client-gallery.css
     'img-gallery' {
         dependsOn 'image-viewer'
         resource url: [plugin: "images-client-plugin", dir: 'js/img-gallery/lib/slider-pro/css', file: 'slider-pro.css']

@@ -1,12 +1,14 @@
 package images.client.plugin
 
+import au.org.ala.web.AuthService
+
 /**
  * Image Client Tag Lib to be used in the gsp related to image client plugin feature
  *
  */
 class ImageClientTagLib {
 
-    def authService
+    AuthService authService
     static namespace = 'imageClient'
 
     /**

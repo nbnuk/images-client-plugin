@@ -1,7 +1,6 @@
 package images.client.plugin
 
-import au.org.ala.web.AlaSecured
-import au.org.ala.web.CASRoles
+import au.org.ala.web.AuthService
 import grails.converters.JSON
 import grails.converters.XML
 import org.apache.commons.httpclient.HttpStatus
@@ -14,7 +13,7 @@ class ImageClientController {
     def imagesWebService
     def speciesListWebService
     def bieWebService
-    def authService
+    AuthService authService
 
     def createSubImage(){
         [userId: authService.getUserId()]

@@ -35,6 +35,7 @@ grails.project.dependency.resolution = {
     dependencies {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
         // runtime 'mysql:mysql-connector-java:5.1.27'
+        compile "commons-httpclient:commons-httpclient:3.1"
         compile('org.codehaus.groovy.modules.http-builder:http-builder:0.7') {
             excludes "commons-logging", "xml-apis", "groovy"
         }
@@ -45,7 +46,7 @@ grails.project.dependency.resolution = {
               ":rest-client-builder:1.0.3") {
             export = false
         }
-        compile ':ala-auth:1.3.4'
+        compile ':ala-auth:2.1.3'
         runtime ':font-awesome-resources:4.3.0.1'
     }
 }
