@@ -7,5 +7,5 @@
 //= require_tree leaflet.draw
 //= require_tree leaflet.loading
 //= require ala-image-viewer.js
-//= require bootbox.min.js
+//= require bootbox/bootbox.min.js
  */
