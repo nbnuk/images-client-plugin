@@ -1,8 +1,10 @@
+package images.client.plugin
+
 class ImagesClientPluginGrailsPlugin {
     // the plugin version
     def version = "0.8"
     // the version or versions of Grails the plugin is designed for
-    def grailsVersion = "2.2 > *"
+    def grailsVersion = "3.2.11 > *"
     // resources that are excluded from plugin packaging
     def pluginExcludes = [
             "grails-app/views/error.gsp"
