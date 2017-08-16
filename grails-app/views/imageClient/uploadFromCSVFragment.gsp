@@ -21,7 +21,7 @@
     </div>
 </g:uploadForm>
 
-<script>
+<asset:script type="text/javascript">
 
     var progressIntervalId = 0;
 
@@ -80,4 +80,4 @@
 
     });
 
-</script>
+</asset:script>

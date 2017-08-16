@@ -1,6 +1,7 @@
 buildscript {
     repositories {
         mavenLocal()
+		maven { url "https://nexus.ala.org.au/content/groups/public/" }
         maven { url "https://repo.grails.org/grails/core" }
     }
     dependencies {
@@ -18,9 +19,14 @@ apply plugin:"org.grails.grails-plugin"
 apply plugin:"org.grails.grails-plugin-publish"
 apply plugin:"org.grails.grails-gsp"
 apply plugin:"asset-pipeline"
+apply plugin:"maven-publish"
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 repositories {
     mavenLocal()
+	maven { url "https://nexus.ala.org.au/content/groups/public/" }
     maven { url "https://repo.grails.org/grails/core" }
 }
 
@@ -43,6 +49,19 @@ dependencies {
     testCompile "org.grails.plugins:geb"
     testRuntime "org.seleniumhq.selenium:selenium-htmlunit-driver:2.47.1"
     testRuntime "net.sourceforge.htmlunit:htmlunit:2.18"
+
+    // jars
+    compile "commons-httpclient:commons-httpclient:3.1"
+
+    compile("org.codehaus.groovy.modules.http-builder:http-builder:0.7.1") {
+        exclude group: 'commons-logging', module: 'commons-logging'
+        exclude group: 'xml-apis', module: 'xml-apis'
+        exclude group: 'org.codehaus.groovy', module: 'groovy'
+    }
+
+    //plugins
+
+    compile "org.grails.plugins:ala-auth:3.0.1"
 }
 
 bootRun {
@@ -53,18 +72,54 @@ bootRun {
 bootRepackage.enabled = false
 grailsPublish {
     // TODO: Provide values here
-    user = 'user'
-    key = 'key'
-    githubSlug = 'foo/bar'
+//    user = 'user'
+//    key = 'key'
+
+    githubSlug = 'AtlasOfLivingAustralia/downloads-plugin'
+    websiteUrl = 'https://github.com/AtlasOfLivingAustralia/images-client-plugin'
     license {
-        name = 'Apache-2.0'
+        name = 'MPL-1.1'
     }
-    title = "My Plugin"
-    desc = "Full plugin description"
-    developers = [johndoe:"John Doe"]
+    issueTrackerUrl = 'https://github.com/AtlasOfLivingAustralia/images-client-plugin/issues'
+    vcsUrl = 'https://github.com/AtlasOfLivingAustralia/images-client-pluginn'
+    title = "ALA Images Client Plugin"
+    desc = "This plugin provides a reusable image viewer component based on Leaflet"
+    developers = [:]
 }
 
 
 assets {
     packagePlugin = true
+}
+
+publishing {
+    repositories {
+        maven {
+            name 'Nexus'
+            url "https://nexus.ala.org.au/content/repositories/${project.version.endsWith('-SNAPSHOT') ? 'snapshots' : 'releases' }"
+            credentials {
+                username = System.getenv('TRAVIS_DEPLOY_USERNAME')
+                password = System.getenv('TRAVIS_DEPLOY_PASSWORD')
+            }
+        }
+    }
+    publications {
+        mavenJar(MavenPublication) {
+            pom.withXml {
+                def pomNode = asNode()
+                pomNode.dependencyManagement.replaceNode {}
+
+                // simply remove dependencies without a version
+                // version-less dependencies are handled with dependencyManagement
+                // see https://github.com/spring-gradle-plugins/dependency-management-plugin/issues/8 for more complete solutions
+                pomNode.dependencies.dependency.findAll {
+                    it.version.text().isEmpty()
+                }.each {
+                    it.replaceNode {}
+                }
+            }
+            from components.java
+
+        }
+    }
 }

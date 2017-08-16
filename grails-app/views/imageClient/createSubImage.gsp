@@ -14,7 +14,7 @@
     </div>
 </div>
 
-<script>
+<asset:script type="text/javascript">
 
     $("#btnCancelSubimage").click(function(e) {
         e.preventDefault();
@@ -34,4 +34,4 @@
         });
     });
 
-</script>
+</asset:script>

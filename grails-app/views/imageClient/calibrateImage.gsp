@@ -20,7 +20,7 @@
         </div>
     </div>
 </div>
-<script>
+<asset:script type="text/javascript">
     $("#btnCancelCalibrateImageScale").click(function(e) {
         e.preventDefault();
         imgvwr.hideModal();
@@ -36,4 +36,4 @@
             imgvwr.hideModal();
         });
     });
-</script>
+</asset:script>
