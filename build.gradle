@@ -75,13 +75,13 @@ grailsPublish {
 //    user = 'user'
 //    key = 'key'
 
-    githubSlug = 'AtlasOfLivingAustralia/downloads-plugin'
+    githubSlug = 'AtlasOfLivingAustralia/images-client-plugin'
     websiteUrl = 'https://github.com/AtlasOfLivingAustralia/images-client-plugin'
     license {
         name = 'MPL-1.1'
     }
     issueTrackerUrl = 'https://github.com/AtlasOfLivingAustralia/images-client-plugin/issues'
-    vcsUrl = 'https://github.com/AtlasOfLivingAustralia/images-client-pluginn'
+    vcsUrl = 'https://github.com/AtlasOfLivingAustralia/images-client-plugin'
     title = "ALA Images Client Plugin"
     desc = "This plugin provides a reusable image viewer component based on Leaflet"
     developers = [:]
