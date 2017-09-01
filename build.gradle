@@ -60,8 +60,7 @@ dependencies {
     }
 
     //plugins
-
-    compile "org.grails.plugins:ala-auth:3.0.1"
+    compile "org.grails.plugins:ala-auth:3.0.2"
 }
 
 bootRun {

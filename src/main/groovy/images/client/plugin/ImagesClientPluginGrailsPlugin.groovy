@@ -42,7 +42,7 @@ class ImagesClientPluginGrailsPlugin extends Plugin {
     }
 
     def doWithSpring = {
-
+        println("ImagesClientPluginGrailsPlugin starting")
     }
 
     def doWithDynamicMethods = { ctx ->
