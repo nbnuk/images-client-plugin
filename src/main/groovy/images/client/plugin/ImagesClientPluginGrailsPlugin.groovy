@@ -1,6 +1,8 @@
 package images.client.plugin
 
-class ImagesClientPluginGrailsPlugin {
+import grails.plugins.Plugin
+
+class ImagesClientPluginGrailsPlugin extends Plugin {
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "3.2.11 > *"
     // resources that are excluded from plugin packaging
@@ -40,28 +42,6 @@ class ImagesClientPluginGrailsPlugin {
     }
 
     def doWithSpring = {
-
-        if (!application.config.grails.cache.config) {
-            application.config.grails.cache.config = {}
-        }
-
-        application.config.grails.cache.config = application.config.grails.cache.config << {
-
-            defaults {
-                eternal false
-                overflowToDisk false
-                maxElementsInMemory 20000
-                timeToLiveSeconds 3600
-            }
-
-            cache {
-                name 'speciesListKvp'
-                eternal false
-                overflowToDisk false
-                maxElementsInMemory 20000
-                timeToLiveSeconds(3600 * 2) // 2 hours
-            }
-        }
 
     }
 
