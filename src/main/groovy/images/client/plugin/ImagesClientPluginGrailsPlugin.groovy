@@ -41,8 +41,10 @@ class ImagesClientPluginGrailsPlugin extends Plugin {
         // TODO Implement additions to web.xml (optional), this event occurs before
     }
 
-    def doWithSpring = {
-        println("ImagesClientPluginGrailsPlugin starting")
+    Closure doWithSpring() {
+        { ->
+            println("ImagesClientPluginGrailsPlugin starting")
+        }
     }
 
     def doWithDynamicMethods = { ctx ->
