@@ -11,8 +11,8 @@ This plugin provides a reusable image viewer component based on [Leaflet](http:/
 The `image-viewer` resources module need to be added to the page where we want to use the viewer. Eg using the Asset Pipeline plugin:
 
 ``` html
-<asset:javascript src="ala/ala-images-client.js"/>
-<asset:stylesheet src="ala/ala-images-client.css" />
+<asset:javascript src="ala/images-client.js"/>
+<asset:stylesheet src="ala/images-client.css" />
 
 ```
 

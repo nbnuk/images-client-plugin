@@ -3,8 +3,6 @@
  *= encoding UTF-8
  * // require jquery
  * // require bootstrap
- *= require_tree leaflet
- *= require_tree leaflet.draw
- *= require_tree leaflet.loading
+ *= require leaflet_all.css
  *= require font-awesome/css/font-awesome-4.3.0.css
  */
