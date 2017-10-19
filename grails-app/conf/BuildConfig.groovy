@@ -27,7 +27,7 @@ grails.project.dependency.resolution = {
     log "warn" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
     repositories {
         mavenLocal()
-        mavenRepo ("http://nexus.ala.org.au/content/groups/public/") {
+        mavenRepo ("https://nexus.ala.org.au/content/groups/public/") {
             updatePolicy 'always'
         }
     }
