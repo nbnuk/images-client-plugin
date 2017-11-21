@@ -12,15 +12,16 @@ class BieWebService {
     def grailsApplication
 
     private String getServiceUrl() {
-        def url = grailsApplication.config.bieService.baseUrl
-        if (!url.endsWith("/")) {
+        def url = grailsApplication.config.bieService?.baseUrl?:null
+        if (url && !url.endsWith("/")) {
             url += "/"
+        } else {
+            url = ""
         }
         return url
     }
 
     def updateBieIndex(def guidImageList) {
-
 
         List<Map> list = []
         guidImageList.each{
@@ -36,7 +37,6 @@ class BieWebService {
         try {
             HttpClient client = new HttpClient();
             PostMethod post = new PostMethod(url);
-           // post.setRequestHeader('Cookie', cookie.toString())
             post.setRequestHeader('Authorization', grailsApplication.config.bieApiKey)
             StringRequestEntity requestEntity = new StringRequestEntity(jsonBody, "application/json", "utf-8")
             post.setRequestEntity(requestEntity)
@@ -48,15 +48,15 @@ class BieWebService {
             } else {
                 response = [text: "Bie updated successfully", status: status ]
             }
-            log.info (text: response, status: status)
+            log.info "${response.text} status: ${response.status}"
 
         } catch (SocketTimeoutException e) {
-            def error = [text: "Timed out calling web service. URL= ${url}."]
-            log.error(error, e)
+            String error = "Timed out calling web service. ${e.getMessage()} URL= ${url}. "
+            log.error error
             response = [text: error, status: 500 ]
         } catch (Exception e) {
-            def error = [text: "Failed calling web service. ${e.getMessage()} URL= ${url}."]
-            log.error(error, e)
+            String error = "Failed calling web service. ${e.getMessage()} URL= ${url}."
+            log.error error
             response = [text: error, status: 500]
         }
         return response
