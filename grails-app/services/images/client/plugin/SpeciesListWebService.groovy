@@ -14,10 +14,10 @@ class SpeciesListWebService {
     def grailsApplication
 
     private String getServiceUrl() {
-        def url = grailsApplication.config.speciesList?.baseURL?:null
+        def url = grailsApplication.config.speciesList?.baseURL?:grailsApplication.config.speciesList?.baseUrl?:null
         if (url && !url.endsWith("/")) {
             url += "/"
-        } else {
+        } else if (!url) {
             url = ""
         }
         return url
@@ -88,7 +88,7 @@ class SpeciesListWebService {
             log.error error
             response = [text: error, status: 500 ]
         } catch (Exception e) {
-            String error = "Failed calling web service. ${e.getMessage()} URL= ${url}."
+            String error = "Failed calling web service. ${e.getMessage()}. You may also want to check speciesList.baseURL config. ${url}."
             log.error error
             response = [text: error, status: 500]
         }

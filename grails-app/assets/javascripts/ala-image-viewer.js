@@ -561,6 +561,8 @@ var imgvwr = {};
                                         setPreferredButton(container);
                                         self.options.preferredImageStatus == true;
                                         showAlert("This Image has been successfully added to ALA Preferred Species Image List");
+                                    } else {
+                                        showAlert("An error has occurred: Status " + data.status + " Reason: " + data.text);
                                     }
                                 },
                                 error: function (data) {

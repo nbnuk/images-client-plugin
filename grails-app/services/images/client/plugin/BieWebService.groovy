@@ -12,10 +12,10 @@ class BieWebService {
     def grailsApplication
 
     private String getServiceUrl() {
-        def url = grailsApplication.config.bieService?.baseUrl?:null
+        def url = grailsApplication.config.bieService?.baseURL?:grailsApplication.config.bieService?.baseUrl?:null
         if (url && !url.endsWith("/")) {
             url += "/"
-        } else {
+        } else if (!url) {
             url = ""
         }
         return url
@@ -55,7 +55,7 @@ class BieWebService {
             log.error error
             response = [text: error, status: 500 ]
         } catch (Exception e) {
-            String error = "Failed calling web service. ${e.getMessage()} URL= ${url}."
+            String error = "Failed calling web service. ${e.getMessage()}. You may also want to check bieService.baseURL config.  URL= ${url}."
             log.error error
             response = [text: error, status: 500]
         }
