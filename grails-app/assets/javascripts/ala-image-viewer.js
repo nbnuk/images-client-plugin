@@ -198,7 +198,7 @@ var imgvwr = {};
         var promise = $.Deferred();
         $.ajax( {
             dataType: 'json',
-            url: getPreferredSpeciesListUrl + "/ws/species/" + guid + "?dr=" + druid, //+ "?dr=drt1476827971152",
+            url: getPreferredSpeciesListUrl + "/ws/species?guid=" + guid + "&dr=" + druid, //+ "?dr=drt1476827971152",
             type: 'get',
             timeout:8000,
             success: function (data) {
