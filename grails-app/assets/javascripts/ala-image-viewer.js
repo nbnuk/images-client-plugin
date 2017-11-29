@@ -196,9 +196,10 @@ var imgvwr = {};
 
     function checkSpeciesImage(guid, imageId, druid, getPreferredSpeciesListUrl) {
         var promise = $.Deferred();
+        var url = getPreferredSpeciesListUrl + "/ws/species?guid=" + guid + "&dr=" + druid;
         $.ajax( {
             dataType: 'json',
-            url: getPreferredSpeciesListUrl + "/ws/species?guid=" + guid + "&dr=" + druid, //+ "?dr=drt1476827971152",
+            url: url, //+ "?dr=drt1476827971152",
             type: 'get',
             timeout:8000,
             success: function (data) {
@@ -215,7 +216,7 @@ var imgvwr = {};
                 }
             },
             error: function(jqXHR, textStatus, errorThrown) {
-                console.error ("Error when calling " + getPreferredSpeciesListUrl + "/ws/species/" + guid + "?dr=" + druid + "(" + errorThrown + ")");
+                console.error ("Error when calling " + url + " (" + errorThrown + ")");
                 promise.reject(jqXHR, textStatus, errorThrown);
                 return promise;
             }
