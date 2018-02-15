@@ -6,12 +6,14 @@ This plugin provides a reusable image viewer component based on [Leaflet](http:/
 
 ## Usage
 
-`runtime ":images-client-plugin:0.6"`
+`runtime ":images-client-plugin:0.8"`
 
-The `image-viewer` resource module needs to be added to the page where we want to use the viewer. Eg using the Resources plugin:
+The `image-viewer` resources module need to be added to the page where we want to use the viewer. Eg using the Asset Pipeline plugin:
 
-```
-<r:require modules="image-viewer"/>
+``` html
+<asset:javascript src="ala/images-client.js"/>
+<asset:stylesheet src="ala/images-client.css" />
+
 ```
 
 :exclamation: This will create a viewer instance in the document global scope called `imgvwr`.
@@ -177,6 +179,11 @@ TODO
 
 
 ## Changelog
+* **version 0.8** (10/08/2017)
+  * Upgraded to Java 8
+  * Upgraded to Grails 2.5.6
+  * Upgraded to ALA Auth 2.x
+  * Added support for Asset Pipeline 
 
 * **version 0.7** (14/06/2016)
   * Added feature to up and down vote an image.

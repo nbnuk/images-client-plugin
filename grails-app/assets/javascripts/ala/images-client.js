@@ -1,11 +1,8 @@
-/*
- * Replaces image-viewer resource in old resources plugin
+
+// * Replaces image-viewer resource in old resources plugin
 //= encoding UTF-8
- * // require jquery
- * // require bootstrap
-//= require_tree leaflet
-//= require_tree leaflet.draw
-//= require_tree leaflet.loading
+// * // require jquery
+// * // require bootstrap
+//= require leaflet_all.js
 //= require ala-image-viewer.js
-//= require bootbox.min.js
- */
+//= require bootbox/bootbox.min.js

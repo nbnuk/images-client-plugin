@@ -2,6 +2,6 @@
  * Replaces image-gallery resource in old resources plugin
  *= encoding UTF-8
  *= require ala/images-client
- *= require img-gallery/img-gallery.css
- *= require img-gallery/lib/slider-pro/css/slider-pro.css
+ *= require img-gallery.css
+ *= require slider-pro/css/slider-pro.css
  */

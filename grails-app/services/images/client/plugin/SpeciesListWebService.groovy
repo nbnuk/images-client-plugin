@@ -14,9 +14,11 @@ class SpeciesListWebService {
     def grailsApplication
 
     private String getServiceUrl() {
-        def url = grailsApplication.config.speciesList.baseURL
-        if (!url.endsWith("/")) {
+        def url = grailsApplication.config.speciesList?.baseURL?:grailsApplication.config.speciesList?.baseUrl?:null
+        if (url && !url.endsWith("/")) {
             url += "/"
+        } else if (!url) {
+            url = ""
         }
         return url
     }
@@ -82,12 +84,12 @@ class SpeciesListWebService {
             response = JSON.parse(responseStr)
 
         } catch (SocketTimeoutException e) {
-            def error = [text: "Timed out calling web service. URL= ${url}."]
-            log.error(error, e)
+            String error = "Timed out calling web service. URL= ${url}."
+            log.error error
             response = [text: error, status: 500 ]
         } catch (Exception e) {
-            def error = [text: "Failed calling web service. ${e.getMessage()} URL= ${url}."]
-            log.error(error, e)
+            String error = "Failed calling web service. ${e.getMessage()}. You may also want to check speciesList.baseURL config. ${url}."
+            log.error error
             response = [text: error, status: 500]
         }
         return response

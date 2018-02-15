@@ -1,10 +1,9 @@
 /*
  * Replaces image-viewer resource in old resources plugin
  *= encoding UTF-8
- * // require jquery
- * // require bootstrap
- *= require_tree leaflet
- *= require_tree leaflet.draw
- *= require_tree leaflet.loading
- *= require font-awesome
+ *= require leaflet_all.css
+ * bootstrap, font-awesome and jquery are provided by ala-bootstrap3
+ **** = require jquery
+ **** = require font-awesome/css/font-awesome-4.3.0.css
+ **** = require bootstrap
  */
