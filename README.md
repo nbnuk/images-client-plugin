@@ -4,9 +4,14 @@ images-client-plugin
 
 This plugin provides a reusable image viewer component based on [Leaflet](http://leafletjs.com/).
 
+The grails2 branch contains the 0.8.x series of the plugin compatible with Grails 2.x
+
+The master branch hosts version 1.x and forward of the plugin compatible with grails 3.x
+
+
 ## Usage
 
-`runtime ":images-client-plugin:0.8"`
+`compile "au.org.ala.plugins.grails:images-client-plugin:1.0", noCache`
 
 The `image-viewer` resources module need to be added to the page where we want to use the viewer. Eg using the Asset Pipeline plugin:
 
