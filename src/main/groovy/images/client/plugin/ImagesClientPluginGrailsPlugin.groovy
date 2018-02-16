@@ -1,8 +1,10 @@
-class ImagesClientPluginGrailsPlugin {
-    // the plugin version
-    def version = "0.8.1-SNAPSHOT"
+package images.client.plugin
+
+import grails.plugins.Plugin
+
+class ImagesClientPluginGrailsPlugin extends Plugin {
     // the version or versions of Grails the plugin is designed for
-    def grailsVersion = "2.2 > *"
+    def grailsVersion = "3.2.11 > *"
     // resources that are excluded from plugin packaging
     def pluginExcludes = [
             "grails-app/views/error.gsp"
@@ -39,30 +41,10 @@ class ImagesClientPluginGrailsPlugin {
         // TODO Implement additions to web.xml (optional), this event occurs before
     }
 
-    def doWithSpring = {
-
-        if (!application.config.grails.cache.config) {
-            application.config.grails.cache.config = {}
+    Closure doWithSpring() {
+        { ->
+            println("ImagesClientPluginGrailsPlugin starting")
         }
-
-        application.config.grails.cache.config = application.config.grails.cache.config << {
-
-            defaults {
-                eternal false
-                overflowToDisk false
-                maxElementsInMemory 20000
-                timeToLiveSeconds 3600
-            }
-
-            cache {
-                name 'speciesListKvp'
-                eternal false
-                overflowToDisk false
-                maxElementsInMemory 20000
-                timeToLiveSeconds(3600 * 2) // 2 hours
-            }
-        }
-
     }
 
     def doWithDynamicMethods = { ctx ->
