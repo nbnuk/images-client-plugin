@@ -336,7 +336,7 @@ var imgvwr = {};
             tms: true,
             noWrap: true,
             bounds: bounds,
-            attribution: 'Atlas of Living Australia'
+            attribution: (opts.organisationName? opts.organisationName : 'Atlas of Living Australia')
         }).addTo(viewer);
 
         if (opts.addImageInfo){
