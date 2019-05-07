@@ -19,65 +19,65 @@
             <button type="button" class="btn btn-primary" id="btnUploadCSVImagesFile">Upload</button>
         </div>
     </div>
+    <script type="text/javascript">
+
+        var progressIntervalId = 0;
+
+        function updateProgress(batchId) {
+            try {
+                $.ajax("${createLink(action:'getBatchProgress')}?batchId=" + batchId).done(function (data) {
+                    if (data.success) {
+                        if (data.taskCount > 0 && data.taskCount == data.tasksCompleted) {
+                            clearInterval(progressIntervalId);
+                            $("#resultsDiv").html("Upload complete.");
+                        } else {
+                            $("#resultsDiv").html("Uploaded " + data.tasksCompleted + " of " + data.taskCount);
+                        }
+                    } else {
+                        clearInterval(progressIntervalId);
+                    }
+                });
+            } catch (e) {
+                $("#resultsDiv").html("Error! " + e);
+                clearInterval(progressIntervalId);
+            }
+        }
+
+        function renderProgress(batchId) {
+            progressIntervalId = setInterval(function() {
+                updateProgress(batchId);
+            }, 1000);
+        }
+
+        $("#btnCancelCSVFileUpload").click(function(e) {
+            e.preventDefault();
+            imglib.hideModal();
+        });
+
+        $("#btnUploadCSVImagesFile").click(function(e) {
+            e.preventDefault();
+
+            var formData = new FormData($("#csvFileUploadForm").get(0));
+
+            if (formData) {
+                $.ajax({
+                    url: "${createLink(action:'uploadImagesFromCSVFile')}",
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    type: 'POST'
+                }).done(function(result) {
+                    if (!result.success) {
+                        $("#resultsDiv").html('<div class="alert alert-error">' + result.message + '</div>').css("display", "block");
+                    } else {
+                        $("#resultsDiv").html('<div class="alert alert-success">' + result.message + '</div>').css("display", "block");
+                        renderProgress(result.batchId);
+                    }
+                });
+            }
+
+        });
+
+    </script>
 </g:uploadForm>
 
-<asset:script type="text/javascript">
-
-    var progressIntervalId = 0;
-
-    function updateProgress(batchId) {
-        try {
-            $.ajax("${createLink(action:'getBatchProgress')}?batchId=" + batchId).done(function (data) {
-                if (data.success) {
-                    if (data.taskCount > 0 && data.taskCount == data.tasksCompleted) {
-                        clearInterval(progressIntervalId);
-                        $("#resultsDiv").html("Upload complete.");
-                    } else {
-                        $("#resultsDiv").html("Uploaded " + data.tasksCompleted + " of " + data.taskCount);
-                    }
-                } else {
-                    clearInterval(progressIntervalId);
-                }
-            });
-        } catch (e) {
-            $("#resultsDiv").html("Error! " + e);
-            clearInterval(progressIntervalId);
-        }
-    }
-
-    function renderProgress(batchId) {
-        progressIntervalId = setInterval(function() {
-            updateProgress(batchId);
-        }, 1000);
-    }
-
-    $("#btnCancelCSVFileUpload").click(function(e) {
-        e.preventDefault();
-        imglib.hideModal();
-    });
-
-    $("#btnUploadCSVImagesFile").click(function(e) {
-        e.preventDefault();
-
-        var formData = new FormData($("#csvFileUploadForm").get(0));
-
-        if (formData) {
-            $.ajax({
-                url: "${createLink(action:'uploadImagesFromCSVFile')}",
-                data: formData,
-                processData: false,
-                contentType: false,
-                type: 'POST'
-            }).done(function(result) {
-                if (!result.success) {
-                    $("#resultsDiv").html('<div class="alert alert-error">' + result.message + '</div>').css("display", "block");
-                } else {
-                    $("#resultsDiv").html('<div class="alert alert-success">' + result.message + '</div>').css("display", "block");
-                    renderProgress(result.batchId);
-                }
-            });
-        }
-
-    });
-
-</asset:script>

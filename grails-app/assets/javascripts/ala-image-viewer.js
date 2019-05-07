@@ -67,6 +67,7 @@ var imgvwr = {};
         auxDataTitle: 'View more information about this image',
         attribution:null,
         initialZoom: 'auto',
+        zoomFudgeFactor: 1,
         disableLikeDislikeButton: false,
         addDownloadButton: true,
         addDrawer: true,
@@ -318,7 +319,7 @@ var imgvwr = {};
             measureControl: measureControlOpts,
             minZoom: 2,
             maxZoom: maxZoom,
-            zoom: getInitialZoomLevel(opts.initialZoom, maxZoom, image, opts.target),
+            zoom: getInitialZoomLevel(opts.initialZoom, opts.zoomFudgeFactor, maxZoom, image, opts.target),
             center: new L.LatLng(centery, centerx),
             crs: L.CRS.Simple
         });
@@ -923,7 +924,13 @@ var imgvwr = {};
                             .setLatLng(e.latlng) //(assuming e.latlng returns the coordinates of the event)
                             .setContent('<p>Loading..' + e.target.options.imageId +'.</p>')
                             .openOn(_viewer);
+
+
+                        console.log("Loading - "+ imageServiceBaseUrl + "/image/imageTooltipFragment?imageId=" + e.target.options.imageId)
+
                         $.ajax( imageServiceBaseUrl + "/image/imageTooltipFragment?imageId=" + e.target.options.imageId).then(function(content) {
+
+                                // console.log(content);
                                 popup.setContent(content);
                             },
                             function(xhr, status, error) {
@@ -981,7 +988,7 @@ var imgvwr = {};
      * @param container
      * @returns {*}
      */
-    getInitialZoomLevel = function (initialZoom, maxZoom, image, container) {
+    getInitialZoomLevel = function (initialZoom, zoomFudgeFactor, maxZoom, image, container) {
         var zoomLevel = maxZoom;
         if (initialZoom == 'auto') {
             var containerWidth = $(container).width();
@@ -990,13 +997,13 @@ var imgvwr = {};
             var imageHeight = image.height;
             if (imageWidth > imageHeight) {
                 // Landscape photo
-                while (containerWidth < imageWidth && zoomLevel > 0) {
+                while (containerWidth < (imageWidth * zoomFudgeFactor) && zoomLevel > 0) {
                     zoomLevel--;
                     imageWidth /= 2;
                 }
             } else {
                 // Portrait photo
-                while (containerHeight < imageHeight && zoomLevel > 0) {
+                while (containerHeight < (imageHeight * zoomFudgeFactor) && zoomLevel > 0) {
                     zoomLevel--;
                     imageHeight /= 2;
                 }
@@ -1024,35 +1031,26 @@ var imgvwr = {};
             content: options.content
         };
 
-        var html = "<div id='" + opts.id + "' class='modal hide' role='dialog' aria-labelledby='modal_label_" + opts.id + "' aria-hidden='true' style='width: " + opts.width + "px; margin-left: -" + opts.width / 2 + "px;overflow: hidden'>";
-        var initialContent = opts.content ? opts.content : "Loading...";
-        if (!opts.hideHeader) {
-            html += "<div class='modal-header'><button type='button' class='close' data-dismiss='modal' aria-hidden='true'>x</button><h3 id='modal_label_" + opts.id + "'>" + opts.title + "</h3></div>";
-        }
-        html += "<div class='modal-body' style='max-height: " + opts.height + "px'>" + initialContent + "</div></div>";
+        $("body").find('#' + opts.id).remove();
 
+        var html = "<div id='" + opts.id + "' class='modal fade' role='dialog' tabindex='-1'>";
+            html += '<div class="modal-dialog" role="document">';
+                html += '<div class="modal-content">';
+                    html += "<div class='modal-header'>";
+                    var initialContent = opts.content ? opts.content : "Loading...";
+                    if (!opts.hideHeader) {
+                        html += "<h3 id='modal_label_" + opts.id + "' class='modal-title'>" + opts.title + "</h3>";
+                    }
+                    html += '</div>';
+                    html += "<div  id='modal_content_" + opts.id + "' class='modal-body' >" + initialContent + "</div>";
+                    html += '<div class="modal-footer"><button type="button" class="btn btn-default" data-dismiss="modal">Close</button></div>';
+                html += '</div>';
+            html += '</div>';
+        html += '</div>';
         $("body").append(html);
-
-        var selector = "#" + opts.id;
-
-        $(selector).on("hidden", function() {
-            if (opts.onClose) {
-                opts.onClose();
-            }
-            $(selector).remove();
-        });
-
-        $(selector).on("shown", function() {
-            if (opts.onShown) {
-                opts.onShown();
-            }
-        });
-
-        $(selector).modal({
-            remote: opts.url,
-            keyboard: opts.keyboard,
-            backdrop: opts.backdrop
-        });
+        console.log(opts.url);
+        $("#modal_content_" + opts.id).load(opts.url);
+        $("#" + opts.id).modal('show');
     };
 
     lib.hideModal = function() {

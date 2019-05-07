@@ -19,21 +19,21 @@
             <button class="btn" id="btnCancelCalibrateImageScale">Cancel</button>
         </div>
     </div>
-</div>
-<asset:script type="text/javascript">
-    $("#btnCancelCalibrateImageScale").click(function(e) {
-        e.preventDefault();
-        imgvwr.hideModal();
-    });
-
-    $("#btnCalibrateImageScale").click(function(e) {
-        e.preventDefault();
-        var units = $("#units").val();
-        var pixelLength = $("#pixelLength").val();
-        var actualLength = $("#mmLength").val();
-        $.ajax(imgvwr.getImageServiceBaseUrl() + "/ws/calibrateImageScale?imageId=${params.id}&units=${params.units}&pixelLength=" + pixelLength + "&userId=${userId}&actualLength=" + actualLength).done(function(data) {
-            imgvwr.setPixelLength(data.pixelsPerMM);
+    <script type="text/javascript">
+        $("#btnCancelCalibrateImageScale").click(function(e) {
+            e.preventDefault();
             imgvwr.hideModal();
         });
-    });
-</asset:script>
+
+        $("#btnCalibrateImageScale").click(function(e) {
+            e.preventDefault();
+            var units = $("#units").val();
+            var pixelLength = $("#pixelLength").val();
+            var actualLength = $("#mmLength").val();
+            $.ajax(imgvwr.getImageServiceBaseUrl() + "/ws/calibrateImageScale?imageId=${params.id}&units=${params.units}&pixelLength=" + pixelLength + "&userId=${userId}&actualLength=" + actualLength).done(function(data) {
+                imgvwr.setPixelLength(data.pixelsPerMM);
+                imgvwr.hideModal();
+            });
+        });
+    </script>
+</div>
