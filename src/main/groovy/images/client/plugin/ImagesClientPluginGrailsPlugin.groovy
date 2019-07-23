@@ -26,7 +26,7 @@ class ImagesClientPluginGrailsPlugin extends Plugin {
     def license = "MPL2"
 
     // Details of company behind the plugin (if there is one)
-    def organization = [ name: "Atlas of Living Australia", url: "https://www.ala.org.au/" ]
+    def organization = [ name: "NBN Atlas", url: "https://www.nbnatlas.org/" ]
 
     // Any additional developers beyond the author specified above.
 //    def developers = [ [ name: "Joe Bloggs", email: "joe@bloggs.net" ]]

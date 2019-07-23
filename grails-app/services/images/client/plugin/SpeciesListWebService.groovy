@@ -24,11 +24,11 @@ class SpeciesListWebService {
     }
 
     private getSpeciesListDruid() {
-        return grailsApplication.config.speciesList.preferredSpeciesListDruid ? grailsApplication.config.speciesList.preferredSpeciesListDruid : "dr4778"
+        return grailsApplication.config.speciesList.preferredSpeciesListDruid ? grailsApplication.config.speciesList.preferredSpeciesListDruid : "dr0"
     }
 
     private getSpeciesListName() {
-        return grailsApplication.config.speciesList.preferredListName ? grailsApplication.config.speciesList.preferredListName : "ALA Preferred Species Images"
+        return grailsApplication.config.speciesList.preferredListName ? grailsApplication.config.speciesList.preferredListName : "Preferred Species Images"
     }
 
     @Cacheable("speciesListKvp")
